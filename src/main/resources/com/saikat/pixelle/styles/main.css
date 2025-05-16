@@ -1,0 +1,21 @@
+.main {
+    -fx-background-color: linear-gradient(from 0% 25% to 100% 100%, #2b2d30, #1e1f22);
+    -fx-gradient: linear;
+    /*-fx-gradient-stops: #2b2d30, #0a2b61;*/
+}
+
+.btn {
+    -fx-background-color: #332525;
+    -fx-padding: 10px;
+    -fx-background-radius: 10px;
+    -fx-smooth: 2;
+    -fx-text-fill: white;
+    -fx-border-radius: 10px;
+    -fx-border-color: white;
+}
+
+.btn:hover {
+    -fx-background-color: #6c3b3b;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
