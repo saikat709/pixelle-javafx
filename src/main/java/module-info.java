@@ -1,5 +1,5 @@
 module com.saikat.pixelle {
-    requires javafx.controls;
+    requires javafxadd origin .controls;
     requires javafx.fxml;
 
     requires org.controlsfx.controls;
