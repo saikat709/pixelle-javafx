@@ -9,6 +9,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.control.TextField?>
+
 <VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.saikat.pixelle.MainController" styleClass="main">
     <padding>

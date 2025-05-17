@@ -16,6 +16,8 @@ public class PhotoEditorApplication extends Application {
         screenManager.initialize(stage);
         screenManager.entryScreen();
 
+        getHostServices().showDocument("http://www.stackoverflow.com");
+
     }
 
     public static void main(String[] args) {

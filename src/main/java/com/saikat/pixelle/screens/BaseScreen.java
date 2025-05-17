@@ -32,7 +32,7 @@ public class BaseScreen {
             throw new IllegalArgumentException("fxmlFile cannot be null");
         }
         FXMLLoader loader = new FXMLLoader(PhotoEditorApplication.class.getResource(fxmlFile));
-        // loader.setController(this);
+        // loader.setController(this); -> N0
         // loader.setRoot(this);
         loader.setResources(null);
 
@@ -52,6 +52,7 @@ public class BaseScreen {
 
         } catch (Exception e) {
             System.out.println("Failed to load scene: IO Exception  inside setScene(): " + e.getLocalizedMessage());
+            e.printStackTrace();
         }
     }
 

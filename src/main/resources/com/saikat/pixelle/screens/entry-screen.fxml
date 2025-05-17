@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.*?>
+
+<?import javafx.geometry.Insets?>
+<VBox alignment="CENTER" styleClass="main"
+      xmlns="http://javafx.com/javafx/17.0.12"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.saikat.pixelle.controllers.EntryScreenController">
+
+    <Label text="Pixelle" styleClass="title"/>
+    <Label text="Create, Edit, Imagine." styleClass="sub-title" />
+
+    <VBox alignment="CENTER" styleClass="btns-container" fx:id="buttonsContainer">
+        <VBox.margin>
+            <Insets top="30" bottom="30"/>
+        </VBox.margin>
+        <HBox alignment="CENTER" styleClass="option-btn">
+            <FontIcon iconLiteral="fas-pen" styleClass="option-btn-icon"/>
+            <VBox styleClass="option-btn-vtext">
+                <Label text="Drawing" styleClass="option-btn-text"/>
+                <Label text="Sketch freely on  a blank Canvas" styleClass="option-btn-text, text-sm"/>
+            </VBox>
+        </HBox>
+
+        <HBox alignment="CENTER" styleClass="option-btn" onMouseClicked="#editButtonClick">
+            <FontIcon iconLiteral="fas-camera" styleClass="option-btn-icon"/>
+            <VBox styleClass="option-btn-vtext">
+                <Label text="Edit" styleClass="option-btn-text"/>
+                <Label text="Sketch freely on  a blank Canvas" styleClass="option-btn-text, text-sm"/>
+            </VBox>
+        </HBox>
+
+        <HBox alignment="CENTER" styleClass="option-btn">
+            <FontIcon iconLiteral="fas-pen" styleClass="option-btn-icon"/>
+            <VBox styleClass="option-btn-vtext">
+                <Label text="Drawing" styleClass="option-btn-text"/>
+                <Label text="Sketch freely on  a blank Canvas" styleClass="option-btn-text, text-sm"/>
+            </VBox>
+        </HBox>
+    </VBox>
+
+    <Label text="Need help getting started?" styleClass="link" onMouseClicked="#openHelpLink"/>
+</VBox>
