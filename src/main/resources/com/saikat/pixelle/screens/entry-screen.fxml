@@ -14,18 +14,12 @@
     <Label text="Create, Edit, Imagine." styleClass="sub-title" />
 
     <VBox alignment="CENTER" styleClass="btns-container" fx:id="buttonsContainer">
+
         <VBox.margin>
             <Insets top="30" bottom="30"/>
         </VBox.margin>
-        <HBox alignment="CENTER" styleClass="option-btn">
-            <FontIcon iconLiteral="fas-pen" styleClass="option-btn-icon"/>
-            <VBox styleClass="option-btn-vtext">
-                <Label text="Drawing" styleClass="option-btn-text"/>
-                <Label text="Sketch freely on  a blank Canvas" styleClass="option-btn-text, text-sm"/>
-            </VBox>
-        </HBox>
 
-        <HBox alignment="CENTER" styleClass="option-btn" onMouseClicked="#editButtonClick">
+        <HBox alignment="CENTER_LEFT" styleClass="option-btn" onMouseClicked="#editButtonClick">
             <FontIcon iconLiteral="fas-camera" styleClass="option-btn-icon"/>
             <VBox styleClass="option-btn-vtext">
                 <Label text="Edit" styleClass="option-btn-text"/>
@@ -33,11 +27,26 @@
             </VBox>
         </HBox>
 
-        <HBox alignment="CENTER" styleClass="option-btn">
+        <HBox alignment="CENTER_LEFT" styleClass="option-btn" onMouseClicked="#drawButtonClick">
             <FontIcon iconLiteral="fas-pen" styleClass="option-btn-icon"/>
             <VBox styleClass="option-btn-vtext">
-                <Label text="Drawing" styleClass="option-btn-text"/>
+                <Label text="Draw" styleClass="option-btn-text"/>
                 <Label text="Sketch freely on  a blank Canvas" styleClass="option-btn-text, text-sm"/>
+            </VBox>
+        </HBox>
+
+        <HBox alignment="CENTER_LEFT" styleClass="option-btn" onMouseClicked="#onTextToImageClick">
+            <FontIcon iconLiteral="fas-font" styleClass="option-btn-icon"/>
+            <VBox styleClass="option-btn-vtext">
+                <Label text="Text to Image" styleClass="option-btn-text"/>
+                <Label text="Sketch freely on  a blank Canvas" styleClass="option-btn-text, text-sm"/>
+            </VBox>
+        </HBox>
+
+        <HBox alignment="CENTER_LEFT" styleClass="option-btn" onMouseClicked="#onExitButtonClick">
+            <FontIcon iconLiteral="fas-cog" styleClass="option-btn-icon"/>
+            <VBox styleClass="option-btn-vtext">
+                <Label text="Exit" styleClass="option-btn-text"/>
             </VBox>
         </HBox>
     </VBox>

@@ -10,11 +10,11 @@
     -fx-text-fill: white;
     -fx-border-radius: 10px;
     -fx-border-color: white;
-    -fx-transition-x: all 1s;
+    -fx-transition-x: all 1;
 }
 
 .btn:hover {
-    -fx-background-color: rgba(51, 42, 51, 0.65);
+    -fx-background-color: rgba(154, 144, 154, 0.65);
     -fx-text-fill: white;
     -fx-scale-x: 1.02;
     -fx-scale-y: 1.02;
@@ -37,24 +37,28 @@
 /*  ENtry screen */
 .btns-container {
     -fx-background-color: rgba(8, 2, 17, 0.1);
-    -fx-effect: shadow( rgba(236, 220, 220, 0.68), 5, 0.0 , 0 , 1);
     -fx-background-radius: 10px;
-    -fx-spacing: 15px;
-    -fx-max-width: 300px;
-    -fx-margin: 30px;
-}
-
-.btns-container:hover{
-    -fx-scale-x: 1.05;
-    -fx-scale-y: 1.05;
-    -fx-effect: none;
+    -fx-spacing: 6px;
+    -fx-max-width: 310px;
+    -fx-margin: 27px;
+    -fx-border-radius: 10px;
+    -fx-border-color: #e6dddd;
+    -fx-padding: 13px;
 }
 
 .option-btn{
-    -fx-spacing: 15px;
-    -fx-alignment: center;
-    -fx-padding: 15px;
+    -fx-spacing: 13px;
+    -fx-alignment: center-left;
+    -fx-padding: 12px;
     -fx-background-radius: 15px;
+    -fx-transition-x: 2;
+    -fx-transition-y: 2;
+}
+
+.option-btn:hover{
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-effect: none;
 }
 
 .option-btn:hover{
@@ -87,13 +91,23 @@
     -fx-text-fill: white;
     -fx-font-size: 34px;
     -fx-font-family: "URW Gothic";
+    -fx-transition-x: all 2;
+    -fx-transition-y: all 2;
 }
 
 .title:hover {
-    -fx-font-size: 38px;
+    -fx-font-size: 43px;
 }
 
 .sub-title {
     -fx-text-fill: #ede3e3;
     -fx-font-size: 17px;
+}
+
+
+.action-button {
+    -fx-border-color: red;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 10px;
 }

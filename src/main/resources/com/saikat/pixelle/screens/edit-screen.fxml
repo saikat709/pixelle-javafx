@@ -2,9 +2,10 @@
 
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.saikat.pixelle.controllers.EntryScreenController"
-            prefHeight="400.0" prefWidth="600.0">
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:id="mainVerticalBox"
+      fx:controller="com.saikat.pixelle.controllers.EditScreenController"
+      prefHeight="Infinity">
 
-</AnchorPane>
+</VBox>

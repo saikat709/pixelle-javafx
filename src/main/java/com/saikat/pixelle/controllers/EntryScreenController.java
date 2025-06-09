@@ -1,9 +1,12 @@
 package com.saikat.pixelle.controllers;
 
-import com.saikat.pixelle.PhotoEditorApplication;
+import com.saikat.pixelle.managers.ScreenManager;
+import com.saikat.pixelle.utils.Open;
+import com.saikat.pixelle.utils.SingletonFactory;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 
@@ -11,11 +14,13 @@ import java.io.File;
 
 public class EntryScreenController {
 
+    private ScreenManager  screenManager;
+
     @FXML
     public VBox buttonsContainer;
 
     public void initialize(){
-        // TODO
+        screenManager = SingletonFactory.getInstance(ScreenManager.class);
     }
 
     @FXML
@@ -24,11 +29,38 @@ public class EntryScreenController {
     }
 
     @FXML
-    public void editButtonClick(Event event){
-        openFileChooser();
+    public void drawButtonClick(MouseEvent mouseEvent) {
+        showPopup("Draw On Canvas", "This screen has not been implemented");
     }
 
-    private void openFileChooser(){
+    @FXML
+    public void editButtonClick(MouseEvent mouseEvent) {
+        File selectedFile = openFileChooser();
+        if (selectedFile != null) {
+            screenManager.editScreen();
+        } else {
+            showPopup("No file chosen", "Please select a file to continue");
+        }
+    }
+
+    @FXML
+    public void onExitButtonClick(MouseEvent mouseEvent) {
+        screenManager.exitApp();
+    }
+
+    @FXML
+    public void onTextToImageClick(MouseEvent mouseEvent) {
+        showPopup("Text to image", "This screen has not been implemented");
+    }
+
+    @FXML
+    public void openHelpLink(Event event){
+        Open open = SingletonFactory.getInstance(Open.class);
+        open.openBrowser("");
+    }
+
+    private File openFileChooser(){
+
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Image File");
         fileChooser.getExtensionFilters().addAll(
@@ -36,18 +68,16 @@ public class EntryScreenController {
         );
 
         File selectedFile = fileChooser.showOpenDialog(null);
+
         if (selectedFile != null) {
             System.out.println("File selected: " + selectedFile.getAbsolutePath());
         } else {
             System.out.println("No file selected");
         }
+
+        return selectedFile;
     }
 
-
-    @FXML
-    public void openHelpLink(){
-        System.out.println("Supposed to open help link here.");
-    }
 
     private void showPopup(String title, String message){
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

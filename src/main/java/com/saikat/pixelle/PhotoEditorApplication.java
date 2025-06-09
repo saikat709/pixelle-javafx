@@ -1,6 +1,7 @@
 package com.saikat.pixelle;
 
 import com.saikat.pixelle.managers.ScreenManager;
+import com.saikat.pixelle.utils.Open;
 import com.saikat.pixelle.utils.SingletonFactory;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -12,11 +13,12 @@ public class PhotoEditorApplication extends Application {
     public void start(Stage stage) throws IOException {
         stage.setTitle("Pixelle");
 
+        Open open = SingletonFactory.getInstance(Open.class);
+        open.initialize(getHostServices());
+
         ScreenManager screenManager = SingletonFactory.getInstance(ScreenManager.class);
         screenManager.initialize(stage);
         screenManager.entryScreen();
-
-        getHostServices().showDocument("http://www.stackoverflow.com");
 
     }
 

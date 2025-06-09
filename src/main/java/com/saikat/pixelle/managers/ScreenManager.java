@@ -1,5 +1,6 @@
 package com.saikat.pixelle.managers;
 
+import com.saikat.pixelle.screens.EditScreen;
 import com.saikat.pixelle.screens.EntryScreen;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -25,15 +26,26 @@ public class ScreenManager {
 
     public void entryScreen() {
         EntryScreen entryScreen = new EntryScreen();
-        if ( positionX != 0 ) stage.setX(positionX);
-        if ( positionY != 0 ) stage.setY(positionY);
         this.showScreen(entryScreen.getScene());
+    }
+
+    public void editScreen() {
+        EditScreen editScreen = new EditScreen();
+        this.showScreen(editScreen.getScene());
     }
 
     private void showScreen(Scene scene){
         stage.hide();
-        stage.setMinWidth(720);
+        stage.setMinWidth(760);
+        stage.setMinHeight(520);
         stage.setScene(scene);
+        if ( positionX != 0 ) stage.setX(positionX);
+        if ( positionY != 0 ) stage.setY(positionY);
         stage.show();
+    }
+
+    public void exitApp() {
+        stage.hide();
+        stage.close();
     }
 }

@@ -28,12 +28,10 @@ public class BaseScreen {
     }
 
     private void setScene(){
-        if ( fxmlFile == null ){
+        if ( fxmlFile == null )
             throw new IllegalArgumentException("fxmlFile cannot be null");
-        }
+
         FXMLLoader loader = new FXMLLoader(PhotoEditorApplication.class.getResource(fxmlFile));
-        // loader.setController(this); -> N0
-        // loader.setRoot(this);
         loader.setResources(null);
 
         try {
@@ -43,12 +41,13 @@ public class BaseScreen {
                             PhotoEditorApplication.class.getResource("styles/main.css")
                     ).toExternalForm()
             );
-            if (  cssFile != null )
+            if (  cssFile != null ) {
                 scene.getStylesheets().add(
                         Objects.requireNonNull(
                                 PhotoEditorApplication.class.getResource(cssFile)
                         ).toExternalForm()
                 );
+            }
 
         } catch (Exception e) {
             System.out.println("Failed to load scene: IO Exception  inside setScene(): " + e.getLocalizedMessage());
