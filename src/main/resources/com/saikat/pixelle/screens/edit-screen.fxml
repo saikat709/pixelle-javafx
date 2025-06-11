@@ -6,6 +6,7 @@
       xmlns:fx="http://javafx.com/fxml"
       fx:id="mainVerticalBox"
       fx:controller="com.saikat.pixelle.controllers.EditScreenController"
-      prefHeight="Infinity">
+      prefHeight="Infinity"
+      spacing="10">
 
 </VBox>

@@ -62,6 +62,7 @@ public class EntryScreenController {
     private File openFileChooser(){
 
         FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
         fileChooser.setTitle("Open Image File");
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg")

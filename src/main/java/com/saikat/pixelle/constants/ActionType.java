@@ -2,5 +2,7 @@ package com.saikat.pixelle.constants;
 
 public enum ActionType {
     SAVE,
-    EXIT,
+    BLUR,
+    FRAMES,
+    EXIT, DRAW,
 }

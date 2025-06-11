@@ -13,6 +13,8 @@ public class EditScreenController {
     public void initialize(){
         mainVerticalBox.getChildren().clear();
         ActionButton editButton = new ActionButton("Save", ActionType.SAVE);
-        mainVerticalBox.getChildren().add(editButton);
+        ActionButton drawButton = new ActionButton("Draw", ActionType.DRAW);
+        ActionButton exitButton = new ActionButton("Draw", ActionType.EXIT);
+        mainVerticalBox.getChildren().addAll(editButton,  drawButton, exitButton);
     }
 }
