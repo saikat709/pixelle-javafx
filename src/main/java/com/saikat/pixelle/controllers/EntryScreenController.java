@@ -1,6 +1,8 @@
 package com.saikat.pixelle.controllers;
 
 import com.saikat.pixelle.managers.ScreenManager;
+import com.saikat.pixelle.savable.AppSettings;
+import com.saikat.pixelle.savable.SavableManager;
 import com.saikat.pixelle.utils.Open;
 import com.saikat.pixelle.utils.SingletonFactory;
 import javafx.event.Event;
@@ -15,12 +17,16 @@ import java.io.File;
 public class EntryScreenController {
 
     private ScreenManager  screenManager;
+    private AppSettings appSettings;
+
 
     @FXML
     public VBox buttonsContainer;
 
     public void initialize(){
         screenManager = SingletonFactory.getInstance(ScreenManager.class);
+        SavableManager savableManager = SingletonFactory.getInstance(SavableManager.class);
+        appSettings = (AppSettings) savableManager.getSavableClass(AppSettings.class);
     }
 
     @FXML
@@ -37,6 +43,7 @@ public class EntryScreenController {
     public void editButtonClick(MouseEvent mouseEvent) {
         File selectedFile = openFileChooser();
         if (selectedFile != null) {
+            appSettings.setLastOpenedDirPath(selectedFile.getParent());
             screenManager.editScreen();
         } else {
             showPopup("No file chosen", "Please select a file to continue");
@@ -50,7 +57,7 @@ public class EntryScreenController {
 
     @FXML
     public void onTextToImageClick(MouseEvent mouseEvent) {
-        showPopup("Text to image", "This screen has not been implemented");
+        screenManager.textToImageScreen();
     }
 
     @FXML
@@ -61,8 +68,14 @@ public class EntryScreenController {
 
     private File openFileChooser(){
 
+        String savedPath = appSettings.getLastOpenedDirPath();
+        System.out.println("Saved path: " + savedPath);
+        File openingDir = savedPath != null ?
+                new File(appSettings.getLastOpenedDirPath()) : new File(System.getProperty("user.home"));
+        System.out.println("Opening directory: " + openingDir.getAbsolutePath());
+
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        fileChooser.setInitialDirectory(openingDir);
         fileChooser.setTitle("Open Image File");
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg")

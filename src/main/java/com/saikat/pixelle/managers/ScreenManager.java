@@ -2,6 +2,7 @@ package com.saikat.pixelle.managers;
 
 import com.saikat.pixelle.screens.EditScreen;
 import com.saikat.pixelle.screens.EntryScreen;
+import com.saikat.pixelle.screens.TextToImageScreen;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -32,6 +33,11 @@ public class ScreenManager {
     public void editScreen() {
         EditScreen editScreen = new EditScreen();
         this.showScreen(editScreen.getScene());
+    }
+
+    public void textToImageScreen() {
+        TextToImageScreen textToImageScreen = new TextToImageScreen();
+        this.showScreen(textToImageScreen.getScene());
     }
 
     private void showScreen(Scene scene){

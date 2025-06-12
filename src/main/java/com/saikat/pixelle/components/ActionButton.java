@@ -2,12 +2,14 @@ package com.saikat.pixelle.components;
 
 import com.saikat.pixelle.constants.ActionType;
 import com.saikat.pixelle.listeners.OnActionButtonClick;
-import javafx.geometry.Insets;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -15,44 +17,96 @@ import org.kordamp.ikonli.javafx.FontIcon;
 public class ActionButton extends VBox {
     private OnActionButtonClick onActionButtonClick;
     private final ActionType actionType;
-    private final String title;
 
     private final Double WIDTH = 70.0;
     private final Double HEIGHT = 70.0;
 
+    private final StringProperty title = new SimpleStringProperty("Title");
+    private final StringProperty iconLiteral = new SimpleStringProperty("fas-save");
+    private final IntegerProperty iconSize = new SimpleIntegerProperty(24);
+
+    Label titleLabel;
+    FontIcon icon;
+
+    public ActionButton(){
+        this(null, null, null);
+    }
+
     public ActionButton(String text, ActionType actionType) {
-        super(5);
-        this.title = text;
+        this(text, null, actionType);
+    }
+
+    public ActionButton(String title, String iconLiteral, ActionType actionType) {
+        super(56);
+        this.title.set(title);
         this.actionType = actionType;
+        this.iconLiteral.set(iconLiteral);
         this.setOnMouseClicked(this::onMouseClicked);
 
         this.getStyleClass().add("action-button");
         this.setMaxSize(WIDTH, HEIGHT);
-
+        this.setSpacing(5);
         setupButton();
     }
 
-    private void setupButton() {
-        Label titleLabel = new Label(title);
-        titleLabel.getStyleClass().add("label");
+    public ActionButton(String title, String iconLiteral) {
+        this(title, iconLiteral, null);
+    }
 
-        FontIcon icon  = new FontIcon();
+    private void setupButton() {
+        titleLabel = new Label(title.getValue());
+        titleLabel.getStyleClass().add("label");
+        icon  = new FontIcon();
         icon.setIconCode(FontAwesomeSolid.SAVE);
-        icon.setIconSize(24);
+        icon.setIconSize(iconSize.get());
         icon.setIconColor(Color.ALICEBLUE);
 
         this.getChildren().addAll(icon, titleLabel);
     }
 
-    private void onMouseClicked(MouseEvent mouseEvent) {
+    public void onMouseClicked(MouseEvent mouseEvent) {
         if ( onActionButtonClick != null ) {
             onActionButtonClick.onClick(mouseEvent, this.actionType);
         }
     }
 
-
     public void setOnActionButtonClick(OnActionButtonClick onActionButtonClick) {
         this.onActionButtonClick = onActionButtonClick;
+    }
+
+    public String getIconLiteral() {
+        return iconLiteral.get();
+    }
+
+    public void setIconLiteral(String iconLiteralProperty) {
+        this.setIcon(iconLiteralProperty);
+    }
+
+    public void setIconCode(FontAwesomeSolid iconName){
+        this.icon.setIconCode(iconName);
+    }
+
+    public void setIcon(String iconLiteral){
+        this.iconLiteral.set(iconLiteral);
+        this.icon.setIconLiteral(iconLiteral);
+    }
+
+    public String getTitle() {
+        return this.title.get();
+    }
+
+    public void setTitle(String title) {
+        this.title.set(title);
+        this.titleLabel.setText(title);
+    }
+
+    public Integer getIconSize() {
+        return iconSize.get();
+    }
+
+    public void setIconSize(Integer iconSizeProperty) {
+        this.iconSize.set(iconSizeProperty);
+        this.icon.setIconSize(iconSizeProperty);
     }
 
 }

@@ -7,6 +7,6 @@
       fx:id="mainVerticalBox"
       fx:controller="com.saikat.pixelle.controllers.EditScreenController"
       prefHeight="Infinity"
-      spacing="10">
+      spacing="2">
 
 </VBox>
