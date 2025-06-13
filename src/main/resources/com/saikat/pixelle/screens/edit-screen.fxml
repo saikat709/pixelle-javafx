@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.scene.layout.*?>
 
 <VBox xmlns="http://javafx.com/javafx"
@@ -8,5 +7,4 @@
       fx:controller="com.saikat.pixelle.controllers.EditScreenController"
       prefHeight="Infinity"
       spacing="2">
-
 </VBox>

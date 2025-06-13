@@ -1,6 +1,7 @@
 package com.saikat.pixelle.screens;
 
 import com.saikat.pixelle.PhotoEditorApplication;
+import com.saikat.pixelle.constants.Screens;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import java.util.Objects;
@@ -11,6 +12,8 @@ public class BaseScreen {
     protected String title;
 
     private Scene scene;
+
+    private Screens screenName;
 
     protected BaseScreen(String fxmlFile, String cssFile, String title) {
         this.fxmlFile = fxmlFile;
@@ -80,6 +83,14 @@ public class BaseScreen {
 
     public void setFxmlFile(String fxmlFile) {
         this.fxmlFile = fxmlFile;
+    }
+
+    public Screens getScreenName() {
+        return screenName;
+    }
+
+    public void setScreenName(Screens screenName) {
+        this.screenName = screenName;
     }
 
     public void setCssFile(String cssFile) {

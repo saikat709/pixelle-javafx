@@ -2,14 +2,15 @@ package com.saikat.pixelle.controllers;
 
 import com.saikat.pixelle.managers.ScreenManager;
 import com.saikat.pixelle.utils.SingletonFactory;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 
 import java.util.Optional;
+import java.util.concurrent.*;
 
 public class TextToImageScreenController {
 
@@ -21,9 +22,9 @@ public class TextToImageScreenController {
     @FXML public Label errorOccurredText;
     @FXML public HBox generatedImage;
 
+    private ProgressIndicator progressIndicator;
+
     private boolean isGenerating = false;
-
-
     private ScreenManager screenManager;
 
     public void initialize() {
@@ -34,26 +35,52 @@ public class TextToImageScreenController {
             generateButton.setDisable(imagePrompt.getText().isEmpty());
         });
 
-        ProgressIndicator progressIndicator = new ProgressIndicator();
+        progressIndicator = new ProgressIndicator();
         progressIndicator.setPrefSize(19, 19);
 
-        generateButton.setOnAction(e -> {
-            if( isGenerating && confirmCancelGeneration() ) {
-                generateButton.setText("Generate");
-                imagePrompt.setDisable(false);
-                generateButton.setGraphic(null);
-                decideVisibleContent(nothingGeneratedText.getId());
-                isGenerating = false;
-            } else  {
-                generateButton.setText("Generating...");
-                imagePrompt.setDisable(true);
-                generateButton.setGraphic(progressIndicator);
-                decideVisibleContent(generatingImageIndicator.getId());
-                isGenerating = true;
-            }
-        });
+        generateButton.setOnAction(this::onGenerateButtonClick);
 
     }
+
+
+    private void onGenerateButtonClick(ActionEvent event) {
+        if( isGenerating && confirmCancelGeneration() ) {
+            generateButton.setText("Generate");
+            imagePrompt.setDisable(false);
+            generateButton.setGraphic(null);
+            decideVisibleContent(nothingGeneratedText.getId());
+            isGenerating = false;
+        } else  {
+            generateButton.setText("Generating...");
+            imagePrompt.setDisable(true);
+            generateButton.setGraphic(progressIndicator);
+            decideVisibleContent(generatingImageIndicator.getId());
+            isGenerating = true;
+            // generateImage();
+            onImageGenerationComplete();
+        }
+
+    }
+
+
+    private void generateImage(){
+        try ( ScheduledExecutorService a = Executors.newSingleThreadScheduledExecutor() ) {
+            a.schedule(this::onImageGenerationComplete, 5, TimeUnit.SECONDS);
+        } catch ( Exception e ) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+
+     private void onImageGenerationComplete(){
+        decideVisibleContent(generatedImage.getId());
+         generateButton.setText("Generate");
+         imagePrompt.setDisable(false);
+         generateButton.setGraphic(null);
+         isGenerating = false;
+     }
+
+    // private void onImageGenerationFailed(){ }
 
 
     private void decideVisibleContent(String id){
