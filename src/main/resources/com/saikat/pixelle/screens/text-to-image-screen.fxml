@@ -6,12 +6,14 @@
 <?import org.kordamp.ikonli.javafx.FontIcon?>
 <?import com.saikat.pixelle.components.ActionButton?>
 
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.saikat.pixelle.controllers.TextToImageScreenController"
       prefHeight="Infinity" prefWidth="Infinity" styleClass="bg-generate">
 
-     <HBox styleClass="tti-header" prefHeight="70" spacing="20" alignment="CENTER_LEFT" VBox.vgrow="NEVER">
+     <HBox styleClass="tti-header" minHeight="70" spacing="20" alignment="CENTER_LEFT" VBox.vgrow="NEVER">
          <FontIcon iconLiteral="fas-arrow-left"
                    fill="ghostwhite"
                    iconSize="20"
@@ -57,7 +59,6 @@
                    AnchorPane.topAnchor="0"
                    AnchorPane.bottomAnchor="0"
                    AnchorPane.leftAnchor="0"
-                   VBox.vgrow="ALWAYS"
                    text="An Unknown Error Occurred Generating the Image."
                    textFill="firebrick"
                    styleClass="text-md"
@@ -87,13 +88,9 @@
                   AnchorPane.leftAnchor="0"
                   spacing="15">
                 <!--  Image View -->
-                <FontIcon iconLiteral="fas-home"
-                          fill="ghostwhite"
-                          iconSize="160"
-                          styleClass="icon"
-                          onMouseClicked="#onBackIconClick"/>
+                <ImageView fx:id="imageView" preserveRatio="true" fitWidth="390" fitHeight="390"/>
                 <VBox alignment="CENTER" spacing="6">
-                    <ActionButton title="Save" iconLiteral="fas-save" spacing="5"/>
+                    <ActionButton title="Save" onMouseClicked="#saveButtonClicked" iconLiteral="fas-save" spacing="5"/>
                     <ActionButton title="Draw" iconLiteral="fas-pen" spacing="5"/>
                     <ActionButton title="Edit" iconLiteral="fas-camera" spacing="5"/>
                 </VBox>

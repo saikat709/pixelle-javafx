@@ -4,6 +4,7 @@ import com.saikat.pixelle.constants.Screens;
 
 public class AppSettings extends Savable {
     private String lastOpenedDirPath;
+    private String lastImageGenPrompt;
     private Screens lastScreen;
 
     public String getLastOpenedDirPath() {
@@ -23,6 +24,16 @@ public class AppSettings extends Savable {
     public void setLastScreen(Screens lastScreen) {
         if ( lastScreen == null || lastScreen == this.lastScreen ) return;
         this.lastScreen = lastScreen;
+        this.saveToDevice();
+    }
+
+    public String getLastImageGenPrompt() {
+        return lastImageGenPrompt;
+    }
+
+    public void setLastImageGenPrompt(String lastImageGenPrompt) {
+        if ( lastImageGenPrompt == null || lastImageGenPrompt.equals(this.lastImageGenPrompt) ) return;
+        this.lastImageGenPrompt = lastImageGenPrompt;
         this.saveToDevice();
     }
 }

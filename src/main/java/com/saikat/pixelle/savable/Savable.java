@@ -2,8 +2,9 @@ package com.saikat.pixelle.savable;
 
 import java.io.*;
 
+import static com.saikat.pixelle.constants.ConstValues.BASE_DIR;
+
 public class Savable implements Serializable {
-    protected File BASE_DIR = new  File(System.getProperty("user.dir"), ".pixelle");
 
     public Savable() {
         if ( !BASE_DIR.exists() ) {

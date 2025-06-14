@@ -23,4 +23,5 @@ module com.saikat.pixelle {
     exports com.saikat.pixelle.components;
     exports com.saikat.pixelle.listeners;
     exports com.saikat.pixelle.savable;
+    exports com.saikat.pixelle.utils;
 }

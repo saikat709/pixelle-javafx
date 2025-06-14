@@ -1,20 +1,32 @@
 package com.saikat.pixelle.controllers;
 
+import com.saikat.pixelle.listeners.OnImageGeneratedListener;
 import com.saikat.pixelle.managers.ScreenManager;
 import com.saikat.pixelle.savable.AppSettings;
 import com.saikat.pixelle.savable.SavableManager;
+import com.saikat.pixelle.utils.GenAI;
 import com.saikat.pixelle.utils.SingletonFactory;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 import java.util.concurrent.*;
+
+import static com.saikat.pixelle.constants.ConstValues.DOWNLOAD_DIR;
 
 public class TextToImageScreenController {
 
@@ -25,25 +37,46 @@ public class TextToImageScreenController {
     @FXML public VBox generatingImageIndicator;
     @FXML public Label errorOccurredText;
     @FXML public HBox generatedImage;
+    @FXML public Image imageComp;
+    @FXML public ImageView imageView;
 
     private ProgressIndicator progressIndicator;
 
     private boolean isGenerating = false;
     private ScreenManager screenManager;
+    private GenAI genAI;
+    private AppSettings appSettings;
+
+    private String generatedImagePath;
 
     public void initialize() {
 
+        SavableManager savableManager = SingletonFactory.getInstance(SavableManager.class);
+        appSettings = (AppSettings) savableManager.getSavableClass(AppSettings.class);
+
+        genAI = new GenAI();
         screenManager = SingletonFactory.getInstance(ScreenManager.class);
         generateButton.setDisable(true);
 
         imagePrompt.setOnKeyPressed( e -> {
-            generateButton.setDisable(imagePrompt.getText().isEmpty());
+            if ( e.getCode().equals(KeyCode.ENTER) ){
+                onGenerateButtonClick(null);
+            } else {
+                generateButton.setDisable(imagePrompt.getText().isEmpty());
+                appSettings.setLastImageGenPrompt(imagePrompt.getText());
+            }
         });
 
         progressIndicator = new ProgressIndicator();
         progressIndicator.setPrefSize(19, 19);
 
         generateButton.setOnAction(this::onGenerateButtonClick);
+
+        String lastPrompt = appSettings.getLastImageGenPrompt();
+        if ( lastPrompt != null ){
+            this.imagePrompt.setText(lastPrompt);
+            generateButton.setDisable(false);
+        }
 
     }
 
@@ -56,36 +89,57 @@ public class TextToImageScreenController {
             decideVisibleContent(nothingGeneratedText.getId());
             isGenerating = false;
         } else  {
+            System.out.println("Started generating....");
             generateButton.setText("Generating...");
             imagePrompt.setDisable(true);
             generateButton.setGraphic(progressIndicator);
             decideVisibleContent(generatingImageIndicator.getId());
             isGenerating = true;
-            // generateImage();
-            onImageGenerationComplete();
+
+            String desc = imagePrompt.getText();
+            genAI.generateImage(desc, new OnImageGeneratedListener() {
+                @Override
+                public void onImageGenerated(String imagePath) {
+                    System.out.println(imagePath);
+                    Platform.runLater(() -> {
+                        onImageGenerationComplete(imagePath);
+                    });
+                }
+
+                @Override
+                public void onError(String errorMessage) {
+                    System.out.println(errorMessage);
+                    Platform.runLater(() -> {
+                        onImageGenerationFailed(errorMessage);
+                    });
+                }
+            });
         }
 
     }
 
 
-    private void generateImage(){
-        try ( ScheduledExecutorService a = Executors.newSingleThreadScheduledExecutor() ) {
-            a.schedule(this::onImageGenerationComplete, 5, TimeUnit.SECONDS);
-        } catch ( Exception e ) {
-            System.err.println(e.getMessage());
-        }
-    }
+     private void onImageGenerationComplete(String generatedImagePath){
+         decideVisibleContent(generatedImage.getId());
 
+         String imagePath = "file:" + generatedImagePath;
+         Image image = new Image(imagePath);
+         imageView.setImage(image);
+         this.generatedImagePath = generatedImagePath;
 
-     private void onImageGenerationComplete(){
-        decideVisibleContent(generatedImage.getId());
          generateButton.setText("Generate");
          imagePrompt.setDisable(false);
          generateButton.setGraphic(null);
          isGenerating = false;
      }
 
-    // private void onImageGenerationFailed(){ }
+     private void onImageGenerationFailed(String errorMessage) {
+         decideVisibleContent(errorOccurredText.getId());
+         generateButton.setText("Generate");
+         imagePrompt.setDisable(false);
+         generateButton.setGraphic(null);
+         isGenerating = false;
+     }
 
 
     private void decideVisibleContent(String id){
@@ -111,15 +165,33 @@ public class TextToImageScreenController {
     }
 
 
-    private File openDirectoryChooser(){
-        SavableManager savableManager = SingletonFactory.getInstance(SavableManager.class);
-        AppSettings settings = (AppSettings) savableManager.getSavableClass(AppSettings.class);
+    private void saveFile(File file, String fileName) throws IOException {
+        File downloadsAppDir = DOWNLOAD_DIR;
+        if (!downloadsAppDir.exists()) downloadsAppDir.mkdirs();
 
-        DirectoryChooser directoryChooser = new  DirectoryChooser();
-        directoryChooser.setTitle("Choose directory");
-        if ( settings.getLastOpenedDirPath() != null )
-            directoryChooser.setInitialDirectory(new File(settings.getLastOpenedDirPath()));
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(downloadsAppDir);
+        fileChooser.setTitle("Save Image As");
+        fileChooser.setInitialFileName(fileName);
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
+        );
 
-        return directoryChooser.showDialog(null);
+        File destination = fileChooser.showSaveDialog(null);
+        if (destination != null) {
+            Files.copy(file.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
+    }
+
+    @FXML
+    public void saveButtonClicked(MouseEvent mouseEvent) {
+        File file = new File(generatedImagePath);
+        int len = appSettings.getLastImageGenPrompt().length();
+        String fileName = appSettings.getLastImageGenPrompt().substring(0, Math.min(len, 20)) + ".png";
+        try {
+            saveFile(file, fileName);
+        } catch (IOException e) {
+            System.err.println("Could not save generated image. Maybe show an error alert.");
+        }
     }
 }
