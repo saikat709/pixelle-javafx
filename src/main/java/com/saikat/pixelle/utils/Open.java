@@ -16,7 +16,7 @@ public class Open {
         }
 
         try {
-            hostServices.showDocument("https://google.com");
+            hostServices.showDocument(url);
         } catch (Exception e) {
             System.err.println("Error opening browser: " + e.getLocalizedMessage());
         }

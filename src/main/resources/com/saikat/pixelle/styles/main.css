@@ -121,7 +121,7 @@ text-white {
     -fx-border-color: #fffffd;
     -fx-border-radius: 10px;
     -fx-background-radius: 10px;
-    -fx-padding: 10px;
+    -fx-padding: 8px 12px;
     -fx-alignment: center;
     -fx-background-color: #533b53;
 }
@@ -157,7 +157,7 @@ text-white {
     -fx-font-size: 23;
 }
 
-.tti-header .icon:hover {
+.icon:hover {
     -fx-scale-x: 1.1;
     -fx-scale-y: 1.1;
 }
@@ -214,4 +214,35 @@ text-white {
     -fx-border-color: white;
     -fx-border-radius: 5px;
     -fx-background-radius: 5px;
+}
+
+.bottom-buttons-scrollbar {
+    -fx-background-color: #6a3b6a;
+}
+
+.bottom-buttons-scrollbar .viewport {
+    -fx-background-color: transparent;
+}
+
+/*
+.bottom-buttons-scrollbar:horizontal {
+    -fx-background-color: transparent;
+    -fx-padding: 0px;
+    -fx-max-height: 0px;
+}
+.bottom-buttons-scrollbar:horizontal .track {
+    -fx-background-color: rgba(238, 238, 238, 0.24);
+    -fx-background-radius: 4px;
+}
+.bottom-buttons-scrollbar:horizontal .thumb {
+    -fx-background-color: rgba(94, 156, 255, 0.35);
+    -fx-background-radius: 4px;
+    -fx-max-width: 1px;
+    -fx-max-height: 1px;
+}
+*/
+
+.bottom-buttons-scrollbar .action-buttons-container {
+    -fx-padding: 10px 18px;
+    -fx-spacing: 8px;
 }

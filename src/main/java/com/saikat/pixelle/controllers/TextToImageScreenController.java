@@ -1,6 +1,8 @@
 package com.saikat.pixelle.controllers;
 
 import com.saikat.pixelle.managers.ScreenManager;
+import com.saikat.pixelle.savable.AppSettings;
+import com.saikat.pixelle.savable.SavableManager;
 import com.saikat.pixelle.utils.SingletonFactory;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -8,7 +10,9 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
 
+import java.io.File;
 import java.util.Optional;
 import java.util.concurrent.*;
 
@@ -28,6 +32,7 @@ public class TextToImageScreenController {
     private ScreenManager screenManager;
 
     public void initialize() {
+
         screenManager = SingletonFactory.getInstance(ScreenManager.class);
         generateButton.setDisable(true);
 
@@ -103,5 +108,18 @@ public class TextToImageScreenController {
     @FXML
     public void onBackIconClick(MouseEvent mouseEvent) {
         screenManager.entryScreen();
+    }
+
+
+    private File openDirectoryChooser(){
+        SavableManager savableManager = SingletonFactory.getInstance(SavableManager.class);
+        AppSettings settings = (AppSettings) savableManager.getSavableClass(AppSettings.class);
+
+        DirectoryChooser directoryChooser = new  DirectoryChooser();
+        directoryChooser.setTitle("Choose directory");
+        if ( settings.getLastOpenedDirPath() != null )
+            directoryChooser.setInitialDirectory(new File(settings.getLastOpenedDirPath()));
+
+        return directoryChooser.showDialog(null);
     }
 }

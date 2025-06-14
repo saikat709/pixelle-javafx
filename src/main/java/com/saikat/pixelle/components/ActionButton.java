@@ -18,7 +18,7 @@ public class ActionButton extends VBox {
     private OnActionButtonClick onActionButtonClick;
     private final ActionType actionType;
 
-    private final Double WIDTH = 70.0;
+    private final Double WIDTH = 70.0 + 5.0;
     private final Double HEIGHT = 70.0;
 
     private final StringProperty title = new SimpleStringProperty("Title");
@@ -38,14 +38,14 @@ public class ActionButton extends VBox {
 
     public ActionButton(String title, String iconLiteral, ActionType actionType) {
         super(56);
-        this.title.set(title);
+        if ( title != null ) this.title.set(title);
         this.actionType = actionType;
-        this.iconLiteral.set(iconLiteral);
+        if ( iconLiteral != null ) this.iconLiteral.set(iconLiteral);
         this.setOnMouseClicked(this::onMouseClicked);
 
         this.getStyleClass().add("action-button");
         this.setMaxSize(WIDTH, HEIGHT);
-        this.setSpacing(5);
+        this.setSpacing(2);
         setupButton();
     }
 
@@ -56,8 +56,8 @@ public class ActionButton extends VBox {
     private void setupButton() {
         titleLabel = new Label(title.getValue());
         titleLabel.getStyleClass().add("label");
-        icon  = new FontIcon();
-        icon.setIconCode(FontAwesomeSolid.SAVE);
+        icon = new FontIcon();
+        icon.setIconLiteral(iconLiteral.getValue());
         icon.setIconSize(iconSize.get());
         icon.setIconColor(Color.ALICEBLUE);
 
@@ -83,6 +83,7 @@ public class ActionButton extends VBox {
     }
 
     public void setIconCode(FontAwesomeSolid iconName){
+        System.out.println(iconName.getCode());
         this.icon.setIconCode(iconName);
     }
 

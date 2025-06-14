@@ -14,6 +14,8 @@ import javafx.stage.FileChooser;
 
 import java.io.File;
 
+import static com.saikat.pixelle.constants.ConstValues.STARTING_HELP_URL;
+
 public class EntryScreenController {
 
     private ScreenManager  screenManager;
@@ -63,7 +65,7 @@ public class EntryScreenController {
     @FXML
     public void openHelpLink(Event event){
         Open open = SingletonFactory.getInstance(Open.class);
-        open.openBrowser("");
+        open.openBrowser(STARTING_HELP_URL);
     }
 
     private File openFileChooser(){

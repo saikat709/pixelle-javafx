@@ -8,6 +8,10 @@ module com.saikat.pixelle {
     requires org.kordamp.ikonli.javafx;
     requires org.kordamp.ikonli.fontawesome5;
     requires jdk.compiler;
+    requires google.genai;
+    requires com.google.common;
+    requires com.google.gson;
+    requires org.apache.tika.core;
 
     opens com.saikat.pixelle to javafx.fxml;
     opens com.saikat.pixelle.screens to javafx.fxml;
