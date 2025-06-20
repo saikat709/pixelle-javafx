@@ -13,7 +13,10 @@ public class PhotoEditorApplication extends Application {
 
     @Override
     public void start(Stage stage) {
+
         stage.setTitle("Pixelle");
+        stage.setMinWidth(760);
+        stage.setMinHeight(520);
 
         Open open = SingletonFactory.getInstance(Open.class);
         open.initializeWithHostServices(getHostServices());

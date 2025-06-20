@@ -12,15 +12,14 @@ import com.google.genai.ResponseStream;
 import com.google.gson.Gson;
 
 import com.saikat.pixelle.listeners.OnImageGeneratedListener;
-import javafx.concurrent.Task;
 import org.apache.tika.mime.MimeTypeException;
 import org.apache.tika.mime.MimeTypes;
 
-import static com.saikat.pixelle.constants.ConstValues.BASE_DIR;
-import static com.saikat.pixelle.constants.ConstValues.GEMINI_IMAGE_MODEL;
+import static com.saikat.pixelle.constants.ConstValues.*;
 
 public class GenAI {
     private OnImageGeneratedListener listener;
+    private Thread apiThread;
 
     public void saveBinaryFile(String fileName, byte[] content) {
         try {
@@ -33,21 +32,6 @@ public class GenAI {
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
-    }
-
-    public void generateImage(String description, OnImageGeneratedListener  listener){
-        this.listener = listener;
-
-        if ( listener != null && description == null ) listener.onError( "Description cannot be null");
-        if ( listener == null ) throw new NullPointerException("OnImageGeneratedListener cannot be null");
-
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                generateImage(description);
-            }
-        };
-        new Thread(runnable).start();
     }
 
     public void generateImage(String description) {
@@ -78,6 +62,10 @@ public class GenAI {
 
         boolean imageGenerated = false;
         for (GenerateContentResponse res : responseStream) {
+            if (Thread.currentThread().isInterrupted()) {
+                responseStream.close();
+                return;
+            }
             if (res.candidates().isEmpty() || res.candidates().get().getFirst().content().isEmpty() || res.candidates().get().get(0).content().get().parts().isEmpty()) {
                 continue;
             }
@@ -85,7 +73,6 @@ public class GenAI {
             List<Part> parts = res.candidates().get().getFirst().content().get().parts().get();
             for (Part part : parts) {
                 if (part.inlineData().isPresent()) {
-                    String fileName = "ai_generated_image";
                     Blob inlineData = part.inlineData().get();
                     String fileExtension;
                     try {
@@ -93,7 +80,7 @@ public class GenAI {
                     } catch (MimeTypeException e) {
                         fileExtension = "";
                     }
-                    saveBinaryFile(fileName + "." + fileExtension, inlineData.data().get());
+                    saveBinaryFile(GENERATED_FILENAME + "." + fileExtension, inlineData.data().get());
                     imageGenerated = true;
                 }
                 else {
@@ -103,6 +90,23 @@ public class GenAI {
         }
         responseStream.close();
         if ( !imageGenerated ) this.listener.onError("Could not generate image.");
+    }
+
+
+    public void cancelGeneration(){
+        if ( apiThread != null && apiThread.isAlive() ) apiThread.interrupt();
+    }
+
+    public void generateImage(String description, OnImageGeneratedListener  listener){
+        this.listener = listener;
+
+        if ( listener != null && description == null ) listener.onError( "Description cannot be null");
+        if ( listener == null ) throw new NullPointerException("OnImageGeneratedListener cannot be null");
+
+        apiThread = new Thread( () -> {
+            generateImage(description);
+        });
+        apiThread.start();
     }
 }
 

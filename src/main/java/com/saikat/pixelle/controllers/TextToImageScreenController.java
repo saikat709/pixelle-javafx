@@ -16,7 +16,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
 import java.io.File;
@@ -30,24 +29,23 @@ import static com.saikat.pixelle.constants.ConstValues.DOWNLOAD_DIR;
 
 public class TextToImageScreenController {
 
-    @FXML public VBox mainGridLayout;
-    @FXML public Button generateButton;
+    @FXML public VBox      mainGridLayout;
+    @FXML public Button    generateButton;
     @FXML public TextField imagePrompt;
-    @FXML public Label nothingGeneratedText;
-    @FXML public VBox generatingImageIndicator;
-    @FXML public Label errorOccurredText;
-    @FXML public HBox generatedImage;
-    @FXML public Image imageComp;
+    @FXML public Label     nothingGeneratedText;
+    @FXML public VBox      generatingImageIndicator;
+    @FXML public Label     errorOccurredText;
+    @FXML public HBox      generatedImage;
+    @FXML public Image     imageComp;
     @FXML public ImageView imageView;
 
-    private ProgressIndicator progressIndicator;
-
-    private boolean isGenerating = false;
+    private boolean       isGenerating = false;
     private ScreenManager screenManager;
-    private GenAI genAI;
-    private AppSettings appSettings;
+    private GenAI         genAI;
+    private AppSettings   appSettings;
+    private String        generatedImagePath;
 
-    private String generatedImagePath;
+    private ProgressIndicator progressIndicator;
 
     public void initialize() {
 
@@ -63,16 +61,17 @@ public class TextToImageScreenController {
                 onGenerateButtonClick(null);
             } else {
                 generateButton.setDisable(imagePrompt.getText().isEmpty());
-                appSettings.setLastImageGenPrompt(imagePrompt.getText());
+                appSettings.setLastImageGenPrompt(imagePrompt.getText() + e.getText());
             }
         });
 
         progressIndicator = new ProgressIndicator();
-        progressIndicator.setPrefSize(19, 19);
+        progressIndicator.setPrefSize(19, 20);
 
         generateButton.setOnAction(this::onGenerateButtonClick);
 
         String lastPrompt = appSettings.getLastImageGenPrompt();
+        System.out.println("Last Image Gen Prompt: " + lastPrompt);
         if ( lastPrompt != null ){
             this.imagePrompt.setText(lastPrompt);
             generateButton.setDisable(false);
@@ -87,6 +86,7 @@ public class TextToImageScreenController {
             imagePrompt.setDisable(false);
             generateButton.setGraphic(null);
             decideVisibleContent(nothingGeneratedText.getId());
+            genAI.cancelGeneration();
             isGenerating = false;
         } else  {
             System.out.println("Started generating....");
@@ -161,13 +161,13 @@ public class TextToImageScreenController {
 
     @FXML
     public void onBackIconClick(MouseEvent mouseEvent) {
+        genAI.cancelGeneration();
         screenManager.entryScreen();
     }
 
-
     private void saveFile(File file, String fileName) throws IOException {
         File downloadsAppDir = DOWNLOAD_DIR;
-        if (!downloadsAppDir.exists()) downloadsAppDir.mkdirs();
+        if ( !downloadsAppDir.exists() ) downloadsAppDir.mkdirs();
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(downloadsAppDir);
@@ -187,7 +187,7 @@ public class TextToImageScreenController {
     public void saveButtonClicked(MouseEvent mouseEvent) {
         File file = new File(generatedImagePath);
         int len = appSettings.getLastImageGenPrompt().length();
-        String fileName = appSettings.getLastImageGenPrompt().substring(0, Math.min(len, 20)) + ".png";
+        String fileName = appSettings.getLastImageGenPrompt().substring(0, Math.min(len, 20)).toLowerCase() + ".png";
         try {
             saveFile(file, fileName);
         } catch (IOException e) {

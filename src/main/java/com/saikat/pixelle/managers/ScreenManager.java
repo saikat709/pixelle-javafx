@@ -56,9 +56,7 @@ public class ScreenManager {
         } else {
             System.err.println("AppSettings is null. Maybe the initialize method never called.");
         }
-        stage.hide();
-        stage.setMinWidth(760);
-        stage.setMinHeight(520);
+        // stage.hide();
         stage.setScene(screen.getScene());
         if ( positionX != 0 ) stage.setX(positionX);
         if ( positionY != 0 ) stage.setY(positionY);

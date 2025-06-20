@@ -2,10 +2,7 @@ package com.saikat.pixelle.components;
 
 import com.saikat.pixelle.constants.ActionType;
 import com.saikat.pixelle.listeners.OnActionButtonClick;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
@@ -16,7 +13,6 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 public class ActionButton extends VBox {
     private OnActionButtonClick onActionButtonClick;
-    private final ActionType actionType;
 
     private final Double WIDTH = 70.0 + 5.0;
     private final Double HEIGHT = 70.0;
@@ -24,9 +20,11 @@ public class ActionButton extends VBox {
     private final StringProperty title = new SimpleStringProperty("Title");
     private final StringProperty iconLiteral = new SimpleStringProperty("fas-save");
     private final IntegerProperty iconSize = new SimpleIntegerProperty(24);
+    private final ObjectProperty<ActionType> actionType = new SimpleObjectProperty<>(ActionType.NONE);
 
-    Label titleLabel;
-    FontIcon icon;
+
+    protected Label titleLabel;
+    protected FontIcon icon;
 
     public ActionButton(){
         this(null, null, null);
@@ -39,7 +37,7 @@ public class ActionButton extends VBox {
     public ActionButton(String title, String iconLiteral, ActionType actionType) {
         super(56);
         if ( title != null ) this.title.set(title);
-        this.actionType = actionType;
+        this.actionType.set(actionType);
         if ( iconLiteral != null ) this.iconLiteral.set(iconLiteral);
         this.setOnMouseClicked(this::onMouseClicked);
 
@@ -66,7 +64,7 @@ public class ActionButton extends VBox {
 
     public void onMouseClicked(MouseEvent mouseEvent) {
         if ( onActionButtonClick != null ) {
-            onActionButtonClick.onClick(mouseEvent, this.actionType);
+            onActionButtonClick.onClick(mouseEvent, this.actionType.get());
         }
     }
 
@@ -110,4 +108,11 @@ public class ActionButton extends VBox {
         this.icon.setIconSize(iconSizeProperty);
     }
 
+    public ActionType getActionType() {
+        return actionType.get();
+    }
+
+    public void setActionType(ActionType actionType) {
+        this.actionType.set(actionType);
+    }
 }

@@ -15,9 +15,13 @@ public class ActionToggleButton extends ActionButton {
     public void onMouseClicked(MouseEvent mouseEvent) {
         super.onMouseClicked(mouseEvent);
         isSelected = !isSelected;
-        if ( onToggleChangeListener != null ) {
-            onToggleChangeListener.onToggleChange(this, isSelected);
-        }
+
+        if ( isSelected ) this.getStyleClass().add("selected");
+        else this.getStyleClass().remove("selected");
+
+        if ( onToggleChangeListener != null )
+            onToggleChangeListener.onToggleChange(mouseEvent, isSelected, this.getActionType());
+
     }
 
     public void setOnToggleChangeListener(OnToggleChangeListener onToggleChangeListener) {

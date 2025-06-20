@@ -1,5 +1,9 @@
 package com.saikat.pixelle.editor;
 
-public class EditCommand {
+import java.io.File;
 
+public class EditCommand {
+    public void applyToFile(File file) {
+        // TODO: Specific editing code
+    }
 }

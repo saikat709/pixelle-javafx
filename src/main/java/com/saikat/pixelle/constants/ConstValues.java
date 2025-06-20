@@ -9,4 +9,6 @@ public class ConstValues {
     public static final String APP_DIRECTORY_NAME = "Pixelle";
     public static final File BASE_DIR = new File(System.getProperty("user.dir"), ".pixelle");
     public static final File DOWNLOAD_DIR = new File(System.getProperty("user.home"), "Downloads/" + APP_DIRECTORY_NAME);
+
+    public static final String GENERATED_FILENAME ="ai generated image";
 }

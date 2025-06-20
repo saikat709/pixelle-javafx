@@ -8,6 +8,7 @@
 
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.image.Image?>
+<?import com.saikat.pixelle.components.ActionToggleButton?>
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.saikat.pixelle.controllers.TextToImageScreenController"
@@ -90,9 +91,10 @@
                 <!--  Image View -->
                 <ImageView fx:id="imageView" preserveRatio="true" fitWidth="390" fitHeight="390"/>
                 <VBox alignment="CENTER" spacing="6">
-                    <ActionButton title="Save" onMouseClicked="#saveButtonClicked" iconLiteral="fas-save" spacing="5"/>
-                    <ActionButton title="Draw" iconLiteral="fas-pen" spacing="5"/>
-                    <ActionButton title="Edit" iconLiteral="fas-camera" spacing="5"/>
+                    <ActionButton actionType="SAVE" title="Save" onMouseClicked="#saveButtonClicked" iconLiteral="fas-save" spacing="3"/>
+                    <ActionButton actionType="DRAW" title="Draw" iconLiteral="fas-pen" spacing="3"/>
+                    <ActionButton actionType="EDIT" title="Edit" iconLiteral="fas-camera" spacing="3"/>
+                    <ActionToggleButton actionType="ADJUSTMENTS" title="Saikat" iconLiteral="fas-redo" spacing="3"/>
                 </VBox>
             </HBox>
         </AnchorPane>
