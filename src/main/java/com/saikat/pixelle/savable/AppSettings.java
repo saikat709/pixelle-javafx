@@ -3,8 +3,8 @@ package com.saikat.pixelle.savable;
 import com.saikat.pixelle.constants.Screens;
 
 public class AppSettings extends Savable {
-    private String lastOpenedDirPath;
-    private String lastImageGenPrompt;
+    private String  lastOpenedDirPath;
+    private String  lastImageGenPrompt;
     private Screens lastScreen;
 
     public String getLastOpenedDirPath() {

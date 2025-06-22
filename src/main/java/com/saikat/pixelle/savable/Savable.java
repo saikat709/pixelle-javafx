@@ -4,7 +4,7 @@ import java.io.*;
 
 import static com.saikat.pixelle.constants.ConstValues.BASE_DIR;
 
-public class Savable implements Serializable {
+public abstract class Savable implements Serializable {
 
     public Savable() {
         if ( !BASE_DIR.exists() ) {

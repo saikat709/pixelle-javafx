@@ -17,7 +17,7 @@ import org.apache.tika.mime.MimeTypes;
 
 import static com.saikat.pixelle.constants.ConstValues.*;
 
-public class GenAI {
+public class GenAIUtil {
     private OnImageGeneratedListener listener;
     private Thread apiThread;
 

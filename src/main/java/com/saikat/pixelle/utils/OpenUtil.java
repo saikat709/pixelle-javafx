@@ -2,7 +2,7 @@ package com.saikat.pixelle.utils;
 
 import javafx.application.HostServices;
 
-public class Open {
+public class OpenUtil {
     private HostServices hostServices;
 
     public void initializeWithHostServices(HostServices hostServices){

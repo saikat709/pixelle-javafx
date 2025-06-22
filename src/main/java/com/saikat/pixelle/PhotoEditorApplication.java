@@ -4,8 +4,8 @@ import com.saikat.pixelle.constants.Screens;
 import com.saikat.pixelle.managers.ScreenManager;
 import com.saikat.pixelle.savable.AppSettings;
 import com.saikat.pixelle.savable.SavableManager;
-import com.saikat.pixelle.utils.Open;
-import com.saikat.pixelle.utils.SingletonFactory;
+import com.saikat.pixelle.utils.OpenUtil;
+import com.saikat.pixelle.utils.SingletonFactoryUtil;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -18,13 +18,13 @@ public class PhotoEditorApplication extends Application {
         stage.setMinWidth(760);
         stage.setMinHeight(520);
 
-        Open open = SingletonFactory.getInstance(Open.class);
+        OpenUtil open = SingletonFactoryUtil.getInstance(OpenUtil.class);
         open.initializeWithHostServices(getHostServices());
 
-        ScreenManager screenManager = SingletonFactory.getInstance(ScreenManager.class);
+        ScreenManager screenManager = SingletonFactoryUtil.getInstance(ScreenManager.class);
         screenManager.initialize(stage);
 
-        SavableManager savableManager = SingletonFactory.getInstance(SavableManager.class);
+        SavableManager savableManager = SingletonFactoryUtil.getInstance(SavableManager.class);
         AppSettings settings = (AppSettings) savableManager.getSavableClass(AppSettings.class);
         Screens lastScreen = settings.getLastScreen();
 

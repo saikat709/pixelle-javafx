@@ -7,8 +7,9 @@
 <?import com.saikat.pixelle.components.ActionButton?>
 
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.image.Image?>
 <?import com.saikat.pixelle.components.ActionToggleButton?>
+<?import com.saikat.pixelle.components.CustomMenu?>
+
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.saikat.pixelle.controllers.TextToImageScreenController"
@@ -23,6 +24,8 @@
          <Label text="Text to Image Generation"
                 styleClass="text"/>
      </HBox>
+
+    <CustomMenu fx:id="menu" />
 
     <VBox fx:id="mainGridLayout" prefWidth="Infinity" spacing="1" VBox.vgrow="ALWAYS">
         <padding>

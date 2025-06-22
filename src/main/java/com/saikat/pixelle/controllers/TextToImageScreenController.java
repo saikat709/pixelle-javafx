@@ -1,11 +1,12 @@
 package com.saikat.pixelle.controllers;
 
+import com.saikat.pixelle.components.CustomMenu;
 import com.saikat.pixelle.listeners.OnImageGeneratedListener;
 import com.saikat.pixelle.managers.ScreenManager;
 import com.saikat.pixelle.savable.AppSettings;
 import com.saikat.pixelle.savable.SavableManager;
-import com.saikat.pixelle.utils.GenAI;
-import com.saikat.pixelle.utils.SingletonFactory;
+import com.saikat.pixelle.utils.GenAIUtil;
+import com.saikat.pixelle.utils.SingletonFactoryUtil;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -22,8 +23,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.*;
 
 import static com.saikat.pixelle.constants.ConstValues.DOWNLOAD_DIR;
 
@@ -38,10 +41,11 @@ public class TextToImageScreenController {
     @FXML public HBox      generatedImage;
     @FXML public Image     imageComp;
     @FXML public ImageView imageView;
+    @FXML public CustomMenu menu;
 
     private boolean       isGenerating = false;
     private ScreenManager screenManager;
-    private GenAI         genAI;
+    private GenAIUtil genAI;
     private AppSettings   appSettings;
     private String        generatedImagePath;
 
@@ -49,11 +53,11 @@ public class TextToImageScreenController {
 
     public void initialize() {
 
-        SavableManager savableManager = SingletonFactory.getInstance(SavableManager.class);
+        SavableManager savableManager = SingletonFactoryUtil.getInstance(SavableManager.class);
         appSettings = (AppSettings) savableManager.getSavableClass(AppSettings.class);
 
-        genAI = new GenAI();
-        screenManager = SingletonFactory.getInstance(ScreenManager.class);
+        genAI = new GenAIUtil();
+        screenManager = SingletonFactoryUtil.getInstance(ScreenManager.class);
         generateButton.setDisable(true);
 
         imagePrompt.setOnKeyPressed( e -> {
@@ -76,6 +80,11 @@ public class TextToImageScreenController {
             this.imagePrompt.setText(lastPrompt);
             generateButton.setDisable(false);
         }
+
+        // setting up menus
+        Map<String, List<String>> mp = new HashMap<>();
+        mp.put("abc", List.of(new String[]{"a", "b", "c" }));
+        menu.setMenus(mp);
 
     }
 
@@ -115,7 +124,6 @@ public class TextToImageScreenController {
                 }
             });
         }
-
     }
 
 

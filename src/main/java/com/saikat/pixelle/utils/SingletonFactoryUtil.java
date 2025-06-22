@@ -5,10 +5,10 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
 
-public final class SingletonFactory {
+public final class SingletonFactoryUtil {
     private static final ConcurrentMap<Class<?>, Object> instances = new ConcurrentHashMap<>();
     
-    private SingletonFactory() {
+    private SingletonFactoryUtil() {
         throw new AssertionError("Not instantiable");
     }
 

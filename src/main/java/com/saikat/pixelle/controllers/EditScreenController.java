@@ -3,10 +3,9 @@ package com.saikat.pixelle.controllers;
 import com.saikat.pixelle.components.ActionButton;
 import com.saikat.pixelle.constants.ActionType;
 import com.saikat.pixelle.managers.ScreenManager;
-import com.saikat.pixelle.utils.SingletonFactory;
+import com.saikat.pixelle.utils.SingletonFactoryUtil;
 import javafx.fxml.FXML;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -25,7 +24,7 @@ public class EditScreenController {
 
     public void initialize(){
 
-        screenManager = SingletonFactory.getInstance(ScreenManager.class);
+        screenManager = SingletonFactoryUtil.getInstance(ScreenManager.class);
 
         // setting up things
         bottomButtonsScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);

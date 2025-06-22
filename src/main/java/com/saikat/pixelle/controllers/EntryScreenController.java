@@ -3,8 +3,8 @@ package com.saikat.pixelle.controllers;
 import com.saikat.pixelle.managers.ScreenManager;
 import com.saikat.pixelle.savable.AppSettings;
 import com.saikat.pixelle.savable.SavableManager;
-import com.saikat.pixelle.utils.Open;
-import com.saikat.pixelle.utils.SingletonFactory;
+import com.saikat.pixelle.utils.OpenUtil;
+import com.saikat.pixelle.utils.SingletonFactoryUtil;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -26,8 +26,8 @@ public class EntryScreenController {
     public VBox buttonsContainer;
 
     public void initialize(){
-        screenManager = SingletonFactory.getInstance(ScreenManager.class);
-        SavableManager savableManager = SingletonFactory.getInstance(SavableManager.class);
+        screenManager = SingletonFactoryUtil.getInstance(ScreenManager.class);
+        SavableManager savableManager = SingletonFactoryUtil.getInstance(SavableManager.class);
         appSettings = (AppSettings) savableManager.getSavableClass(AppSettings.class);
     }
 
@@ -64,7 +64,7 @@ public class EntryScreenController {
 
     @FXML
     public void openHelpLink(Event event){
-        Open open = SingletonFactory.getInstance(Open.class);
+        OpenUtil open = SingletonFactoryUtil.getInstance(OpenUtil.class);
         open.openBrowser(STARTING_HELP_URL);
     }
 

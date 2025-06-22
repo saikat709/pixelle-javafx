@@ -7,8 +7,7 @@ import com.saikat.pixelle.screens.BaseScreen;
 import com.saikat.pixelle.screens.EditScreen;
 import com.saikat.pixelle.screens.EntryScreen;
 import com.saikat.pixelle.screens.TextToImageScreen;
-import com.saikat.pixelle.utils.SingletonFactory;
-import javafx.scene.Scene;
+import com.saikat.pixelle.utils.SingletonFactoryUtil;
 import javafx.stage.Stage;
 
 public class ScreenManager {
@@ -27,7 +26,7 @@ public class ScreenManager {
             positionY = newValue.doubleValue();
         });
 
-        SavableManager savableManager = SingletonFactory.getInstance(SavableManager.class);
+        SavableManager savableManager = SingletonFactoryUtil.getInstance(SavableManager.class);
         this.settings = (AppSettings) savableManager.getSavableClass(AppSettings.class);
     }
 
