@@ -1,6 +1,8 @@
 package com.saikat.pixelle.components;
 
 import com.saikat.pixelle.listeners.OnMenuItemClickListener;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Menu;
@@ -19,17 +21,12 @@ public class CustomMenu extends MenuBar {
         MenuItem newFile = new MenuItem("New");
         MenuItem open = new MenuItem("Open");
         MenuItem exit = new MenuItem("Exit");
-
         fileMenu.getItems().addAll(newFile, open, new SeparatorMenuItem(), exit);
-
-        Menu editMenu = new javafx.scene.control.Menu("Edit");
+        Menu editMenu = new Menu("Edit");
         editMenu.getItems().addAll(new MenuItem("Cut"), new MenuItem("Copy"), new MenuItem("Paste"));
-
         Menu helpMenu = new Menu("Help");
         MenuItem about = new MenuItem("About");
-
         helpMenu.getItems().add(about);
-
         this.getMenus().addAll(fileMenu, editMenu, helpMenu);
     }
 
@@ -58,13 +55,15 @@ public class CustomMenu extends MenuBar {
                 Integer finalMenuIndex = menuIndex;
                 Integer finalItemIndex = itemIndex;
                 menuItem.setOnAction(action -> {
-                    if ( onMenuItemClickListener != null )  onMenuItemClickListener.onClick(finalMenuIndex, finalItemIndex);
+                    MenuItem a = ( MenuItem ) action.getSource();
+                    if ( onMenuItemClickListener != null )
+                        onMenuItemClickListener.onClick(finalMenuIndex, finalItemIndex, a);
                 });
 
                 itemIndex++;
             }
             this.getMenus().add(menu);
-            menu.getItems().add(new SeparatorMenuItem());
+            // if ( menuIndex < menus.size() -  1 ) menu.getItems().add(new SeparatorMenuItem());
 
             menuIndex++;
         }

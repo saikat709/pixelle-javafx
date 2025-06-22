@@ -39,13 +39,12 @@ public class TextToImageScreenController {
     @FXML public VBox      generatingImageIndicator;
     @FXML public Label     errorOccurredText;
     @FXML public HBox      generatedImage;
-    @FXML public Image     imageComp;
     @FXML public ImageView imageView;
     @FXML public CustomMenu menu;
 
     private boolean       isGenerating = false;
     private ScreenManager screenManager;
-    private GenAIUtil genAI;
+    private GenAIUtil     genAI;
     private AppSettings   appSettings;
     private String        generatedImagePath;
 
@@ -54,9 +53,8 @@ public class TextToImageScreenController {
     public void initialize() {
 
         SavableManager savableManager = SingletonFactoryUtil.getInstance(SavableManager.class);
-        appSettings = (AppSettings) savableManager.getSavableClass(AppSettings.class);
-
-        genAI = new GenAIUtil();
+        appSettings   = (AppSettings) savableManager.getSavableClass(AppSettings.class);
+        genAI         = new GenAIUtil();
         screenManager = SingletonFactoryUtil.getInstance(ScreenManager.class);
         generateButton.setDisable(true);
 
@@ -75,7 +73,6 @@ public class TextToImageScreenController {
         generateButton.setOnAction(this::onGenerateButtonClick);
 
         String lastPrompt = appSettings.getLastImageGenPrompt();
-        System.out.println("Last Image Gen Prompt: " + lastPrompt);
         if ( lastPrompt != null ){
             this.imagePrompt.setText(lastPrompt);
             generateButton.setDisable(false);
@@ -83,7 +80,8 @@ public class TextToImageScreenController {
 
         // setting up menus
         Map<String, List<String>> mp = new HashMap<>();
-        mp.put("abc", List.of(new String[]{"a", "b", "c" }));
+        mp.put("File", List.of(new String[]{"Save", "Save As", "Open" }));
+        mp.put("Tools", List.of(new String[]{"Package", "Go Back", "Clear Prompt" }));
         menu.setMenus(mp);
 
     }
