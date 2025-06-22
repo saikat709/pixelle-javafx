@@ -78,9 +78,9 @@ public class GenAI {
                     try {
                         fileExtension = allTypes.forName(inlineData.mimeType().orElse("")).getExtension();
                     } catch (MimeTypeException e) {
-                        fileExtension = "";
+                        fileExtension = ".";
                     }
-                    saveBinaryFile(GENERATED_FILENAME + "." + fileExtension, inlineData.data().get());
+                    saveBinaryFile(GENERATED_FILENAME  + fileExtension, inlineData.data().get());
                     imageGenerated = true;
                 }
                 else {
