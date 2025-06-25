@@ -7,9 +7,12 @@ public enum ActionType {
     DRAW,
     CROP,
     FRAMES,
+    COLOR_FILTERS,
     ADJUSTMENTS,
 
     EDIT,
     EXIT,
-    NONE
+    NONE,
+
+    OPEN,
 }

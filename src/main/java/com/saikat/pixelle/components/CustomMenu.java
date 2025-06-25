@@ -1,8 +1,6 @@
 package com.saikat.pixelle.components;
 
 import com.saikat.pixelle.listeners.OnMenuItemClickListener;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Menu;
@@ -10,7 +8,6 @@ import javafx.scene.control.MenuItem;
 
 import java.util.List;
 import java.util.Map;
-
 
 public class CustomMenu extends MenuBar {
 
