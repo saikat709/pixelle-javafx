@@ -11,4 +11,5 @@ public class ConstValues {
     public static final File DOWNLOAD_DIR = new File(System.getProperty("user.home"), "Downloads/" + APP_DIRECTORY_NAME);
 
     public static final String GENERATED_FILENAME ="ai generated image";
+    public static final String CURRENTLY_EDITING_IMAGE ="currently_editing_image";
 }
