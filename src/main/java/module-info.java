@@ -1,6 +1,7 @@
 module com.saikat.pixelle {
-    // requires javafxadd origin .controls;
+    // requires javafx add origin .controls;
     requires javafx.fxml;
+    requires javafx.swing;
 
     requires org.controlsfx.controls;
     requires org.kordamp.bootstrapfx.core;
@@ -17,6 +18,7 @@ module com.saikat.pixelle {
     opens com.saikat.pixelle.screens to javafx.fxml;
     opens com.saikat.pixelle.controllers to javafx.fxml;
     opens com.saikat.pixelle.components;
+
     exports com.saikat.pixelle;
     exports com.saikat.pixelle.constants;
     exports com.saikat.pixelle.screens to javafx.fxml;

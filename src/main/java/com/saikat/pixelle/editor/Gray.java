@@ -4,122 +4,98 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import javax.imageio.ImageIO;
 
 public class Gray implements EditorCommand {
-    private Map<String, BufferedImage> originalImages;
 
-    public Gray() {
-        this.originalImages = new HashMap<>();
+    int[] previousPixels;
+
+    @Override
+    public void applyToFile(BufferedImage img) {
+        long start = System.nanoTime();
+
+        int width = img.getWidth();
+        int height = img.getHeight();
+        int[] pixels = img.getRGB(0, 0, width, height, null, 0, width);
+        previousPixels = pixels;
+
+        for (int i = 0; i < pixels.length; i++) {
+            int p = pixels[i];
+
+            int a = (p >> 24) & 0xff;
+            int r = (p >> 16) & 0xff;
+            int g = (p >> 8) & 0xff;
+            int b = p & 0xff;
+
+            int avg = (r + g + b) / 3;
+
+            p = (a << 24) | (avg << 16) | (avg << 8) | avg;
+
+            pixels[i] = p;
+        }
+        img.setRGB(0, 0, width, height, pixels, 0, width);
+
+        long end = System.nanoTime();
+        System.out.println("Time taken: " + (end - start) / 1_000_000 + " ms");
+    }
+
+    private static int getNewPixel(int pixel) {
+        int alpha = ( pixel >> 24) & 0xff;
+        int red   = ( pixel >> 16) & 0xff;
+        int green = ( pixel >> 8 )  & 0xff;
+        int blue  = pixel & 0xff;
+
+        red   = red / 2;
+        green = green / 2;
+        blue  = blue / 2;
+
+        return (alpha << 24) | (red << 16) | (green << 8) | blue;
     }
 
     @Override
-    public void applyToFile(File file) {
-        try {
-            BufferedImage originalImage = ImageIO.read(file);
-            originalImages.put(file.getAbsolutePath(), deepCopy(originalImage));
-            BufferedImage filteredImage = applyGrayscaleWithCircularMask(originalImage);
-            String fileName = file.getName();
-            String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
-            ImageIO.write(filteredImage, extension, file);
-        } catch (IOException e) {
-            System.err.println("Error applying filter to file: " + file.getName());
-            e.printStackTrace();
-        }
+    public void removeAppliedEdit(BufferedImage originalImage) {
+//        for (Pixel p : previousValues) {
+//            originalImage.setRGB(p.getPositionX(), p.getPositionY(), p.getValue());
+//        }
+        originalImage.setRGB(0, 0, originalImage.getWidth(), originalImage.getHeight(),
+                previousPixels, 0, originalImage.getWidth());
     }
 
     @Override
-    public void removeAppliedEdit(File file) {
-        String filePath = file.getAbsolutePath();
-
-        if (originalImages.containsKey(filePath)) {
-            try {
-                BufferedImage originalImage = originalImages.get(filePath);
-                String fileName = file.getName();
-                String extension = fileName.substring(fileName.lastIndexOf('.') + 1);
-                ImageIO.write(originalImage, extension, file);
-                originalImages.remove(filePath);
-                System.out.println("Removed filter from: " + file.getName());
-
-            } catch (IOException e) {
-                System.err.println("Error removing filter from file: " + file.getName());
-                e.printStackTrace();
-            }
-        } else {
-            System.out.println("No original image found for: " + file.getName());
-        }
-    }
-
-    private BufferedImage applyGrayscaleWithCircularMask(BufferedImage original) {
-        int width = original.getWidth();
-        int height = original.getHeight();
-
-        BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        int centerX = width / 2;
-        int centerY = height / 2;
-
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                int rgb = original.getRGB(x, y);
-
-                // Calculate distance from center
-                double distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
-
-                // Outside the circle - apply grayscale
-                Color originalColor = new Color(rgb);
-                int gray = (int) (0.299 * originalColor.getRed() +
-                        0.587 * originalColor.getGreen() +
-                        0.114 * originalColor.getBlue());
-                Color grayColor = new Color(gray, gray, gray);
-                result.setRGB(x, y, grayColor.getRGB());
-            }
-        }
-
-        return result;
-    }
-
-    private BufferedImage deepCopy(BufferedImage original) {
-        BufferedImage copy = new BufferedImage(original.getWidth(),
-                original.getHeight(),
-                original.getType());
-        Graphics2D g = copy.createGraphics();
-        g.drawImage(original, 0, 0, null);
-        g.dispose();
-        return copy;
+    public String toString() {
+        return "Gray Edit.";
     }
 
     public static void main(String[] args) {
-        createTestImage();
 
-        Gray filter = new Gray();
-
-        File testFile = new File("/home/saikat/Pictures/Camera/Photo from 2025-04-21 15-36-25.411928.jpeg");
-
-        if (testFile.exists()) {
-            System.out.println("Original file size: " + testFile.length() + " bytes");
-
-            // Apply the filter
-            filter.applyToFile(testFile);
-            System.out.println("Filtered file size: " + testFile.length() + " bytes");
-
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-
-            filter.removeAppliedEdit(testFile);
-            System.out.println("Restored file size: " + testFile.length() + " bytes");
-
-            filter.applyToFile(testFile);
-
-        } else {
-            System.out.println("Test image not found. Make sure 'test_image.png' exists in the current directory.");
-            System.out.println("A test image has been created for you.");
-        }
+//        Gray filter = new Gray();
+//
+//        File testFile = new File("/home/saikat/Pictures/Screenshots/_.png");
+//
+//        if (testFile.exists()) {
+//            System.out.println("Original file size: " + testFile.length() + " bytes");
+//
+//            // Apply the filter
+//            filter.applyToFile(testFile);
+//            System.out.println("Filtered file size: " + testFile.length() + " bytes");
+//
+//            ( new Scanner(System.in ) ).nextLine();
+//
+//            try {
+//                Thread.sleep(200);
+//            } catch (InterruptedException e) {
+//                Thread.currentThread().interrupt();
+//            }
+//
+//            filter.removeAppliedEdit(testFile);
+//            System.out.println("Restored file size: " + testFile.length() + " bytes");
+//
+//        } else {
+//            System.out.println("Test image not found. Make sure 'test_image.png' exists in the current directory.");
+//            System.out.println("A test image has been created for you.");
+//        }
     }
+
 
     private static void createTestImage() {
         int width = 400;

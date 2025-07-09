@@ -6,3 +6,4 @@ import javafx.event.Event;
 public interface OnActionButtonClick {
     public void onClick(Event event, ActionType actionType);
 }
+

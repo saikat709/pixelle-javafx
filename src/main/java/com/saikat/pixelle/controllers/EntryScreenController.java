@@ -12,9 +12,13 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 
+import javax.imageio.ImageIO;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
-import static com.saikat.pixelle.constants.ConstValues.STARTING_HELP_URL;
+import static com.saikat.pixelle.constants.ConstValues.*;
 
 public class EntryScreenController {
 
@@ -44,11 +48,18 @@ public class EntryScreenController {
     @FXML
     public void editButtonClick(MouseEvent mouseEvent) {
         File selectedFile = openFileChooser();
-        if (selectedFile != null) {
-            appSettings.setLastOpenedDirPath(selectedFile.getParent());
-            screenManager.editScreen();
-        } else {
-            showPopup("No file chosen", "Please select a file to continue");
+        try {
+            if (selectedFile != null) {
+                appSettings.setLastOpenedDirPath(selectedFile.getParent());
+                File destFile = new File(BASE_DIR, CURRENTLY_EDITING_IMAGE + ".png");
+                Files.copy(selectedFile.toPath(), destFile.toPath(),
+                        StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
+                screenManager.editScreen();
+            } else {
+                showPopup("No file chosen", "Please select a file to continue");
+            }
+        } catch (IOException ex ){
+            showPopup("Error opening file", ex.getMessage());
         }
     }
 

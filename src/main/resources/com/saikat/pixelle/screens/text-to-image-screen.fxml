@@ -7,7 +7,6 @@
 <?import com.saikat.pixelle.components.ActionButton?>
 
 <?import javafx.scene.image.ImageView?>
-<?import com.saikat.pixelle.components.ActionToggleButton?>
 <?import com.saikat.pixelle.components.CustomMenu?>
 
 <VBox xmlns="http://javafx.com/javafx"
@@ -97,7 +96,7 @@
                     <ActionButton actionType="SAVE" title="Save" onMouseClicked="#saveButtonClicked" iconLiteral="fas-save" spacing="3"/>
                     <ActionButton actionType="DRAW" title="Draw" iconLiteral="fas-pen" spacing="3"/>
                     <ActionButton actionType="EDIT" title="Edit" iconLiteral="fas-camera" spacing="3"/>
-                    <ActionToggleButton actionType="ADJUSTMENTS" title="Saikat" iconLiteral="fas-redo" spacing="3"/>
+                    <ActionButton actionType="NONE" title="Re Gen." iconLiteral="fas-redo" spacing="3"/>
                 </VBox>
             </HBox>
         </AnchorPane>

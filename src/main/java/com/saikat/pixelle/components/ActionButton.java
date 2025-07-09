@@ -10,7 +10,6 @@ import javafx.scene.paint.Color;
 import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-
 public class ActionButton extends VBox {
     private OnActionButtonClick onActionButtonClick;
 
@@ -63,9 +62,7 @@ public class ActionButton extends VBox {
     }
 
     public void onMouseClicked(MouseEvent mouseEvent) {
-        if ( onActionButtonClick != null ) {
-            onActionButtonClick.onClick(mouseEvent, this.actionType.get());
-        }
+        if ( onActionButtonClick != null )  onActionButtonClick.onClick(mouseEvent, this.actionType.get());
     }
 
     public void setOnActionButtonClick(OnActionButtonClick onActionButtonClick) {

@@ -18,6 +18,9 @@ public class PhotoEditorApplication extends Application {
         stage.setMinWidth(760);
         stage.setMinHeight(520);
 
+        System.setProperty("glass.win.uiScale", "100%"); // Force Glass to use 100% scale
+        System.setProperty("prism.forcehiDPI", "false"); // Disable HiDPI if it's causing issues
+
         OpenUtil open = SingletonFactoryUtil.getInstance(OpenUtil.class);
         open.initializeWithHostServices(getHostServices());
 

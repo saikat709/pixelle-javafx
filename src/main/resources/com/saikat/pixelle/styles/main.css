@@ -1,5 +1,5 @@
 .main {
-    -fx-background-color: linear-gradient(from 50% 0% to 55% 60%, rgba(9, 90, 90, 0.87), rgba(83, 9, 43, 0.73), rgba(64, 20, 57, 0.85));
+    -fx-background-color: linear-gradient(from 50% 0% to 55% 60%, rgb(236, 84, 236), rgb(131, 42, 131), rgb(193, 19, 141));
 }
 
 .btn {
@@ -103,8 +103,8 @@ text-white {
 }
 
 .title {
-    -fx-text-fill: white;
-    -fx-font-size: 34px;
+    -fx-text-fill: rgb(3, 4, 11);
+    -fx-font-size: 38px;
     -fx-font-family: "URW Gothic";
     -fx-transition-x: all 2;
     -fx-transition-y: all 2;
@@ -170,6 +170,10 @@ text-white {
 .icon:hover {
     -fx-scale-x: 1.1;
     -fx-scale-y: 1.1;
+}
+
+.icon:disabled {
+    -fx-fill: gray;
 }
 
 .input-grid {

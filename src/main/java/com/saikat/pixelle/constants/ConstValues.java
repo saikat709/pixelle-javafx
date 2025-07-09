@@ -12,4 +12,6 @@ public class ConstValues {
 
     public static final String GENERATED_FILENAME ="ai generated image";
     public static final String CURRENTLY_EDITING_IMAGE ="currently_editing_image";
+
+    public static final double UI_SCALE_FACTOR = 1.006;
 }
