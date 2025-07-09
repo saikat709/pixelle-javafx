@@ -58,7 +58,7 @@ public class EditScreenController {
         screenManager = SingletonFactoryUtil.getInstance(ScreenManager.class);
 
         File file = new File(BASE_DIR, CURRENTLY_EDITING_IMAGE + ".png");
-        photoEditor = new PhotoEditor(file);
+        photoEditor = new PhotoEditor(imageView);
 
         addButtons();
         updateUndoRedo();

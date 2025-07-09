@@ -1,14 +1,10 @@
 package com.saikat.pixelle.editor;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-
+import javafx.scene.image.ImageView;
 
 public class PhotoEditor {
+    ImageView currentImage;
     Node tail;
-    BufferedImage currentlyEditingImage;
 
     private static class Node {
         EditorCommand command;
@@ -22,23 +18,16 @@ public class PhotoEditor {
     }
 
 
-    public PhotoEditor (File file){
+    public PhotoEditor (ImageView imageView){
         this.tail = null;
-        if ( !file.exists() ) {
-            throw new RuntimeException("Image not found: " + file.getAbsolutePath());
-        }
-        try {
-            currentlyEditingImage = ImageIO.read(file);
-        } catch (IOException e ){
-            System.out.println("Error in Photo editor cons. Reading as buffer.");
-        }
+        this.currentImage = imageView;
     }
 
 
     public void addEditingCommand(EditorCommand command) {
         System.out.println("Started adding.");
 
-        if ( currentlyEditingImage == null ){
+        if ( currentImage == null ){
             throw new RuntimeException("Currently editing file is null. Never initialized.");
         }
 
@@ -52,8 +41,8 @@ public class PhotoEditor {
         node.previous = tail;
         tail.next = node;
         tail = node;
-        command.applyToFile(currentlyEditingImage);
 
+        // command.applyToFile(currentlyEditingImage);
         System.out.println("Applied command " + command);
     }
 
@@ -63,7 +52,7 @@ public class PhotoEditor {
             throw new RuntimeException("No next edit command found");
         }
         tail = tail.next;
-        tail.command.applyToFile(currentlyEditingImage);
+        // tail.command.applyToFile(currentlyEditingImage);
         System.out.println("Redo called.");
     }
 
@@ -71,7 +60,7 @@ public class PhotoEditor {
         if ( !hasPrevious() ){
             throw new RuntimeException("No previous step.");
         }
-        tail.command.removeAppliedEdit(currentlyEditingImage);
+        // tail.command.removeAppliedEdit(currentlyEditingImage);
         tail = tail.previous;
         System.out.println("Undo called.");
     }
