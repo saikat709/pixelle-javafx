@@ -15,20 +15,17 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
-public class ColorEffectPreviewSideBar extends VBox {
+public class ColorEffectPreviewSideBar extends SideBar {
     private final ImageView originalImage;
 
     public ColorEffectPreviewSideBar(ImageView image) {
+        super();
         this.originalImage = image;
-        this.setAlignment(Pos.TOP_LEFT);
         this.setSpacing(8.0);
-        this.setPadding(new Insets(5));
-        this.setMinWidth(250);
-
-        addElements();
     }
 
-    private void addElements() {
+    @Override
+    protected void addElements() {
         Label title = new Label("Color Effects");
         title.setFont(Font.font("Arial", FontWeight.BOLD, 20));
 

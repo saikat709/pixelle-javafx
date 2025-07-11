@@ -14,7 +14,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 
-import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;

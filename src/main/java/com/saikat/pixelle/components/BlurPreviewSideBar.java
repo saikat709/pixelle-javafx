@@ -13,20 +13,17 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
-public class BlurPreviewSideBar extends VBox {
+public class BlurPreviewSideBar extends SideBar {
     private final ImageView originalImage;
 
     public BlurPreviewSideBar(ImageView image) {
+        super();
         this.originalImage = image;
-
-        this.setMinWidth(250);
-        this.setAlignment(Pos.TOP_LEFT);
-        this.setSpacing(10.0);
-
         addElements();
     }
 
-    private void addElements() {
+    @Override
+    protected void addElements() {
         Label title = new Label("Blur Previews");
         title.setAlignment(Pos.CENTER);
         title.setFont(Font.font("Arial", FontWeight.BOLD, 20));

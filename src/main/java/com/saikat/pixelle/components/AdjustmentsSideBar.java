@@ -11,22 +11,16 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
-public class AdjustmentsSideBar extends VBox {
+public class AdjustmentsSideBar extends SideBar {
 
     private OnAdjustmentChange onAdjustmentChange;
 
     public AdjustmentsSideBar() {
         this.onAdjustmentChange = null;
-
-        this.setWidth(250);
-        this.setAlignment(Pos.TOP_LEFT);
-        this.setSpacing(10.0);
-        this.setPadding(new Insets(10));
-
-        addElements();
     }
 
-    private void addElements() {
+    @Override
+    protected void addElements() {
         Label title = new Label("Adjustments");
         title.setFont(Font.font("Arial", FontWeight.BOLD, 20));
         Separator separator = new Separator(Orientation.HORIZONTAL);

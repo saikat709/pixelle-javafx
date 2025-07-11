@@ -19,7 +19,7 @@ import javafx.scene.text.FontWeight;
 
 import java.awt.event.MouseEvent;
 
-public class BorderSideBar extends VBox {
+public class BorderSideBar extends SideBar {
 
     private OnSliderChange onSliderChange;
     private OnColorSelect  onColorSelect;
@@ -27,24 +27,21 @@ public class BorderSideBar extends VBox {
     public BorderSideBar(){
         this.onSliderChange = null;
         this.onColorSelect = null;
-
-        this.setWidth(250);
-        this.setAlignment(Pos.TOP_LEFT);
-        this.setSpacing(10.0);
-
-        addElements();
     }
 
-    private void addElements(){
+    @Override
+    protected void addElements(){
 
         Label title = new Label("Image Border");
         title.setAlignment(Pos.CENTER);
         title.setFont(Font.font("Arial", FontWeight.BOLD, 20));
+
         Separator separator = new Separator(Orientation.HORIZONTAL);
         VBox.setMargin(separator, new Insets(0,0,0,10));
 
         Label color = new Label("Pick Color: ");
         color.setFont(Font.font("Arial", 16));
+
         ColorPicker colorPicker = getColorPicker();
 
         Label width = new Label("Width: ");
@@ -54,9 +51,7 @@ public class BorderSideBar extends VBox {
         OnSliderChange sliderChange = onSliderChange;
         slider.setOnMouseReleased(event -> {
             System.out.println(slider.getValue());
-
             if ( sliderChange != null ) sliderChange.onChange(slider.getValue());
-
         });
 
         this.getChildren().addAll(title, separator, color, colorPicker, width, slider);
@@ -69,15 +64,7 @@ public class BorderSideBar extends VBox {
         colorPicker.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
                 Color c = colorPicker.getValue();
-
-                System.out.println("Red = "
-                        + c.getRed()
-                        + ", Green = "
-                        + c.getGreen()
-                        + ", Blue = "
-                        + c.getBlue()
-                );
-
+                System.out.println(c.toString());
                 if ( listener != null ) listener.onSelect(c);
             }
         });
