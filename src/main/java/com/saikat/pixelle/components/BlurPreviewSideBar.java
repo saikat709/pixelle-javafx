@@ -17,9 +17,8 @@ public class BlurPreviewSideBar extends SideBar {
     private final ImageView originalImage;
 
     public BlurPreviewSideBar(ImageView image) {
-        super();
         this.originalImage = image;
-        addElements();
+        super();
     }
 
     @Override

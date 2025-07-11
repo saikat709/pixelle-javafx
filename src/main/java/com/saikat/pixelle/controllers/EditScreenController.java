@@ -113,7 +113,9 @@ public class EditScreenController {
         System.out.println("Click: " + actionType.toString() + ", Is toggle: " + isToggle );
 
         if ( isToggle ) {
-            // TODO: Manage toggles
+            // TODO: Manage
+            if ( lastToggleButton != null ) lastToggleButton.setSelected(false);
+            lastToggleButton = (ActionToggleButton) src;
         }
 
         switch (actionType){
@@ -161,7 +163,6 @@ public class EditScreenController {
         List<ActionButton> buttons = new ArrayList<>();
         buttons.add(new ActionButton("File", "fas-file", ActionType.FILE));
         buttons.add(new ActionToggleButton("Crop", "fas-crop", ActionType.CROP));
-        buttons.add(new ActionButton("Save", "fas-save", ActionType.SAVE));
         buttons.add(new ActionToggleButton("Rotate", "fas-sync-alt", ActionType.ROTATE));
         buttons.add(new ActionToggleButton("Resize", "fas-expand-arrows-alt", ActionType.RESIZE));
         buttons.add(new ActionToggleButton("Adjust", "fas-sliders-h", ActionType.ADJUST));

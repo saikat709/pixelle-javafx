@@ -19,8 +19,8 @@ public class ColorEffectPreviewSideBar extends SideBar {
     private final ImageView originalImage;
 
     public ColorEffectPreviewSideBar(ImageView image) {
-        super();
         this.originalImage = image;
+        super();
         this.setSpacing(8.0);
     }
 

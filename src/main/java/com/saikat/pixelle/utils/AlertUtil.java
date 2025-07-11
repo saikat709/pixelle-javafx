@@ -19,6 +19,7 @@ public class AlertUtil {
         Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle("Confirmation");
+        dialog.setAlwaysOnTop(true);
 
         Label label = new Label(message);
         label.setFont(Font.font("Arial", FontWeight.NORMAL, 14));

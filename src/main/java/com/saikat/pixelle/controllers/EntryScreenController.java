@@ -59,7 +59,8 @@ public class EntryScreenController {
                         StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
                 screenManager.editScreen();
             } else {
-                showPopup("No file chosen", "Please select a file to continue");
+                // showPopup("No file chosen", "Please select a file to continue");
+                System.out.println("No file choosen.");
             }
         } catch (IOException ex ){
             showPopup("Error opening file", ex.getMessage());

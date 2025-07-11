@@ -43,5 +43,7 @@ public class ActionToggleButton extends ActionButton {
 
     public void setSelected(boolean selected) {
         this.selected.set(selected);
+        if ( selected ) this.getStyleClass().add("selected");
+        else this.getStyleClass().remove("selected");
     }
 }
