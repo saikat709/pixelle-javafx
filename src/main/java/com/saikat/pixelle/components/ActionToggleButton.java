@@ -1,5 +1,6 @@
 package com.saikat.pixelle.components;
 
+import com.saikat.pixelle.constants.ActionType;
 import com.saikat.pixelle.listeners.OnToggleChangeListener;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -10,6 +11,10 @@ public class ActionToggleButton extends ActionButton {
     private OnToggleChangeListener onToggleChangeListener;
 
     private final BooleanProperty selected = new SimpleBooleanProperty(false);
+
+    public ActionToggleButton(String crop, String s, ActionType actionType) {
+        super(crop, s, actionType);
+    }
 
     @Override
     public void onMouseClicked(MouseEvent mouseEvent) {

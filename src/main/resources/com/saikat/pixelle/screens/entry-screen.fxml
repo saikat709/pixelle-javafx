@@ -10,7 +10,7 @@
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.saikat.pixelle.controllers.EntryScreenController">
 
-    <Label text="Pixelle" styleClass="title"/>
+    <Label text="Pixelle" fx:id="titleText" styleClass="title"/>
     <Label text="Create, Edit, Imagine." styleClass="sub-title" />
 
     <VBox alignment="CENTER" styleClass="btns-container" fx:id="buttonsContainer">

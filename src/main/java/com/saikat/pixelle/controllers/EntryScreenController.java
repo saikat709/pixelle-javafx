@@ -3,11 +3,13 @@ package com.saikat.pixelle.controllers;
 import com.saikat.pixelle.managers.ScreenManager;
 import com.saikat.pixelle.savable.AppSettings;
 import com.saikat.pixelle.savable.SavableManager;
+import com.saikat.pixelle.utils.HoverUtil;
 import com.saikat.pixelle.utils.OpenUtil;
 import com.saikat.pixelle.utils.SingletonFactoryUtil;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -26,13 +28,15 @@ public class EntryScreenController {
     private AppSettings appSettings;
 
 
-    @FXML
-    public VBox buttonsContainer;
+    @FXML public VBox buttonsContainer;
+    @FXML public Label titleText;
 
     public void initialize(){
         screenManager = SingletonFactoryUtil.getInstance(ScreenManager.class);
         SavableManager savableManager = SingletonFactoryUtil.getInstance(SavableManager.class);
         appSettings = (AppSettings) savableManager.getSavableClass(AppSettings.class);
+
+        HoverUtil.applyScaleHover(titleText, 1.25);
     }
 
     @FXML

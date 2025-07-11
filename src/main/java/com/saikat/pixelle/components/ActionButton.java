@@ -4,6 +4,7 @@ import com.saikat.pixelle.constants.ActionType;
 import com.saikat.pixelle.listeners.OnActionButtonClick;
 import javafx.beans.property.*;
 import javafx.scene.control.Label;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -13,8 +14,8 @@ import org.kordamp.ikonli.javafx.FontIcon;
 public class ActionButton extends VBox {
     private OnActionButtonClick onActionButtonClick;
 
-    private final Double WIDTH = 70.0 + 5.0;
-    private final Double HEIGHT = 70.0;
+    private final Double WIDTH  = 80.0;
+    private final Double HEIGHT = 80.0;
 
     private final StringProperty title = new SimpleStringProperty("Title");
     private final StringProperty iconLiteral = new SimpleStringProperty("fas-save");
@@ -41,6 +42,7 @@ public class ActionButton extends VBox {
         this.setOnMouseClicked(this::onMouseClicked);
 
         this.getStyleClass().add("action-button");
+        this.setMinSize(WIDTH, HEIGHT);
         this.setMaxSize(WIDTH, HEIGHT);
         this.setSpacing(2);
         setupButton();
@@ -53,6 +55,9 @@ public class ActionButton extends VBox {
     private void setupButton() {
         titleLabel = new Label(title.getValue());
         titleLabel.getStyleClass().add("label");
+        titleLabel.setEllipsisString("...");
+        titleLabel.setTextOverrun(OverrunStyle.ELLIPSIS);
+
         icon = new FontIcon();
         icon.setIconLiteral(iconLiteral.getValue());
         icon.setIconSize(iconSize.get());

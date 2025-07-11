@@ -106,14 +106,12 @@ text-white {
     -fx-text-fill: rgb(3, 4, 11);
     -fx-font-size: 38px;
     -fx-font-family: "URW Gothic";
-    -fx-transition-x: all 2;
-    -fx-transition-y: all 2;
 }
 
-.title:hover {
-    -fx-scale-x: 1.35;
-    -fx-scale-y: 1.20;
-}
+/*.title:hover {*/
+/*    -fx-scale-x: 1.35;*/
+/*    -fx-scale-y: 1.20;*/
+/*}*/
 
 .sub-title {
     -fx-text-fill: #ede3e3;
@@ -262,4 +260,39 @@ text-white {
 .bottom-buttons-scrollbar .action-buttons-container {
     -fx-padding: 10px 18px;
     -fx-spacing: 8px;
+}
+
+
+.scroll-pane-transparent {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane-transparent  .viewport {
+    -fx-background-color: transparent;
+}
+
+
+.sidebar {
+    -fx-background-color: transparent;
+    -fx-border-color: rgba(255, 255, 255, 0.91);
+    -fx-border-image-insets: 10px;
+    -fx-border-radius: 10px;
+}
+
+.sidebar .viewport {
+    -fx-background-color: transparent;
+    -fx-padding: 10px;
+}
+
+
+.blur-preview {
+    -fx-border-color: #ccc;
+    -fx-border-width: 2;
+    -fx-border-radius: 5;
+    -fx-padding: 0;
+}
+
+.blur-preview:hover {
+    -fx-scale-x: 1.08;
+    -fx-scale-y: 1.08;
 }

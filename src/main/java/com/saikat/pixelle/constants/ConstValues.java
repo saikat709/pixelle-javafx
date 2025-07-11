@@ -14,4 +14,5 @@ public class ConstValues {
     public static final String CURRENTLY_EDITING_IMAGE ="currently_editing_image";
 
     public static final double UI_SCALE_FACTOR = 1.006;
+    public static final double ZOOM_FACTOR = 1.05;
 }

@@ -1,17 +1,19 @@
 package com.saikat.pixelle.editor;
 
+import javafx.scene.effect.Effect;
 import javafx.scene.image.ImageView;
 
 public class PhotoEditor {
-    ImageView currentImage;
-    Node tail;
+    private ImageView currentImage;
+    private Node tail;
+    private Effect lastEffect;
 
     private static class Node {
-        EditorCommand command;
+        Object edit;
         Node next, previous;
 
-        public Node(EditorCommand command) {
-            this.command = command;
+        public Node(Object object) {
+            this.edit = object;
             this.next = null;
             this.previous = null;
         }
@@ -21,6 +23,12 @@ public class PhotoEditor {
     public PhotoEditor (ImageView imageView){
         this.tail = null;
         this.currentImage = imageView;
+        this.lastEffect = null;
+    }
+
+
+    public void addEffect(Effect effect){
+        // if ( this.lastEffect !=  null ) effect.setInput();
     }
 
 

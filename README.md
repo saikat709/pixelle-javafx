@@ -20,3 +20,19 @@ Methods you have use -
   &nbsp; <!-- space between images -->
   <img src="https://github.com/saikat709/pixelle-javafx/blob/main/ui.png?raw=true" alt="Image 2" width="45%" style="margin-bottom: auto;"/>
 </p>
+
+### Features
+1. Open
+2. Save
+3. Crop
+4. Rotate
+5. Resize
+6. Adjust - Brightness, Contrast, Saturation
+7. Filters
+8. Redo
+9. Zoom In
+10. Zoom Out
+11. Draw
+12. Text
+13. Reset
+14. Cancel
