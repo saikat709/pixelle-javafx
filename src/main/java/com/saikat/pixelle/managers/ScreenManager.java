@@ -34,6 +34,11 @@ public class ScreenManager {
         System.out.println("ScreenManager is running: " + a );
     }
 
+    public void startApplication(){
+        if ( settings.getLastScreen() == null ) this.entryScreen();
+        else showScreenByName(settings.getLastScreen());
+    }
+
     public void entryScreen() {
         EntryScreen entryScreen = new EntryScreen();
         this.showScreen(entryScreen);
@@ -55,7 +60,6 @@ public class ScreenManager {
         } else {
             System.err.println("AppSettings is null. Maybe the initialize method never called.");
         }
-        // stage.hide();
         stage.setScene(screen.getScene());
         if ( positionX != 0 ) stage.setX(positionX);
         if ( positionY != 0 ) stage.setY(positionY);
@@ -73,7 +77,9 @@ public class ScreenManager {
                 this.entryScreen();
                 break;
             case EDIT:
-                this.editScreen();
+                System.out.println("Last: " + lastScreen + ", is null: " + (settings.getSelectedImagePath() == null) + ", " + settings.getSelectedImagePath() );
+                if (settings.getSelectedImagePath() == null) this.entryScreen();
+                else this.editScreen();
                 break;
             case TEXT_TO_IMAGE:
                 this.textToImageScreen();

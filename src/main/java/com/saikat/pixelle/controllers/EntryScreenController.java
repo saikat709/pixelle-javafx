@@ -3,6 +3,7 @@ package com.saikat.pixelle.controllers;
 import com.saikat.pixelle.managers.ScreenManager;
 import com.saikat.pixelle.savable.AppSettings;
 import com.saikat.pixelle.savable.SavableManager;
+import com.saikat.pixelle.utils.FileChooserUtil;
 import com.saikat.pixelle.utils.HoverUtil;
 import com.saikat.pixelle.utils.OpenUtil;
 import com.saikat.pixelle.utils.SingletonFactoryUtil;
@@ -12,12 +13,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 
 import static com.saikat.pixelle.constants.ConstValues.*;
 
@@ -50,21 +47,25 @@ public class EntryScreenController {
 
     @FXML
     public void editButtonClick(MouseEvent mouseEvent) {
-        File selectedFile = openFileChooser();
-        try {
-            if (selectedFile != null) {
-                appSettings.setLastOpenedDirPath(selectedFile.getParent());
-                File destFile = new File(BASE_DIR, CURRENTLY_EDITING_IMAGE + ".png");
-                Files.copy(selectedFile.toPath(), destFile.toPath(),
-                        StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
-                screenManager.editScreen();
-            } else {
-                // showPopup("No file chosen", "Please select a file to continue");
-                System.out.println("No file choosen.");
-            }
-        } catch (IOException ex ){
-            showPopup("Error opening file", ex.getMessage());
+        File selectedFile = FileChooserUtil.selectAnImage();
+
+        if ( selectedFile == null ){
+            // showPopup("No file chosen", "Please select a file to continue");
+            System.out.println("No file chosen.");
         }
+
+        appSettings.setLastOpenedDirPath(selectedFile.getParent());
+        appSettings.setSelectedImagePath(selectedFile.getAbsolutePath());
+        System.out.println("Selected: " + selectedFile.getAbsolutePath());
+        screenManager.editScreen();
+
+        /**
+        File destFile = new File(BASE_DIR, CURRENTLY_EDITING_IMAGE + ".png");
+        Files.copy(selectedFile.toPath(),
+                destFile.toPath(),
+                StandardCopyOption.REPLACE_EXISTING,
+                StandardCopyOption.COPY_ATTRIBUTES);
+         */
     }
 
     @FXML
@@ -83,31 +84,6 @@ public class EntryScreenController {
         open.openBrowser(STARTING_HELP_URL);
     }
 
-    private File openFileChooser(){
-
-        String savedPath = appSettings.getLastOpenedDirPath();
-        System.out.println("Saved path: " + savedPath);
-        File openingDir = savedPath != null ?
-                new File(appSettings.getLastOpenedDirPath()) : new File(System.getProperty("user.home"));
-        System.out.println("Opening directory: " + openingDir.getAbsolutePath());
-
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setInitialDirectory(openingDir);
-        fileChooser.setTitle("Open Image File");
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg")
-        );
-
-        File selectedFile = fileChooser.showOpenDialog(null);
-
-        if (selectedFile != null) {
-            System.out.println("File selected: " + selectedFile.getAbsolutePath());
-        } else {
-            System.out.println("No file selected");
-        }
-
-        return selectedFile;
-    }
 
 
     private void showPopup(String title, String message){

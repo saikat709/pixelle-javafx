@@ -55,7 +55,7 @@
           fx:id="bodyHBox"
           style="-fx-background-color: #813581">
         <ScrollPane
-               fx:id="imageContainer"
+               fx:id="imageContainerScrollPane"
                VBox.vgrow="ALWAYS"
                vbarPolicy="NEVER"
                hbarPolicy="NEVER"
@@ -63,12 +63,14 @@
                fitToHeight="true"
                HBox.hgrow="ALWAYS"
                styleClass="scroll-pane-transparent">
-                <BorderPane VBox.vgrow="ALWAYS" prefWidth="1000">
+                <BorderPane VBox.vgrow="ALWAYS">
                     <center>
-                        <ImageView
-                            fx:id="imageView"
-                            preserveRatio="true" pickOnBounds="true"
-                        />
+                        <StackPane fx:id="imageContainerStackPane" style="-fx-background-color: red;">
+                            <ImageView
+                                fx:id="imageView"
+                                preserveRatio="true" pickOnBounds="true"
+                            />
+                        </StackPane>
                     </center>
                 </BorderPane>
         </ScrollPane>

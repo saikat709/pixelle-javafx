@@ -27,13 +27,7 @@ public class PhotoEditorApplication extends Application {
         ScreenManager screenManager = SingletonFactoryUtil.getInstance(ScreenManager.class);
         screenManager.initialize(stage);
 
-        SavableManager savableManager = SingletonFactoryUtil.getInstance(SavableManager.class);
-        AppSettings settings = (AppSettings) savableManager.getSavableClass(AppSettings.class);
-        Screens lastScreen = settings.getLastScreen();
-
-        if ( lastScreen != null ) screenManager.showScreenByName(lastScreen);
-        else screenManager.entryScreen();
-
+        screenManager.startApplication();
     }
 
     public static void main(String[] args) {

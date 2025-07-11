@@ -6,6 +6,7 @@ public class AppSettings extends Savable {
     private String  lastOpenedDirPath;
     private String  lastImageGenPrompt;
     private Screens lastScreen;
+    private String  selectedImagePath;
 
     public String getLastOpenedDirPath() {
         return lastOpenedDirPath;
@@ -34,6 +35,16 @@ public class AppSettings extends Savable {
     public void setLastImageGenPrompt(String lastImageGenPrompt) {
         if ( lastImageGenPrompt == null || lastImageGenPrompt.equals(this.lastImageGenPrompt) ) return;
         this.lastImageGenPrompt = lastImageGenPrompt;
+        this.saveToDevice();
+    }
+
+    public String getSelectedImagePath() {
+        return selectedImagePath;
+    }
+
+    public void setSelectedImagePath(String selectedImagePath) {
+        if ( selectedImagePath == null || selectedImagePath.equals(this.selectedImagePath) ) return;
+        this.selectedImagePath = selectedImagePath;
         this.saveToDevice();
     }
 }

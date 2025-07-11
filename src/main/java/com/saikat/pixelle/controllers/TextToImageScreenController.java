@@ -6,6 +6,7 @@ import com.saikat.pixelle.managers.ScreenManager;
 import com.saikat.pixelle.savable.AppSettings;
 import com.saikat.pixelle.savable.SavableManager;
 import com.saikat.pixelle.utils.GenAIUtil;
+import com.saikat.pixelle.utils.FileChooserUtil;
 import com.saikat.pixelle.utils.SingletonFactoryUtil;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -17,7 +18,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,8 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import static com.saikat.pixelle.constants.ConstValues.DOWNLOAD_DIR;
 
 public class TextToImageScreenController {
 
@@ -80,12 +78,11 @@ public class TextToImageScreenController {
 
         // setting up menus
         Map<String, List<String>> mp = new HashMap<>();
-        mp.put("File", List.of(new String[]{"Save", "Save As", "Open" }));
-        mp.put("Tools", List.of(new String[]{"Package", "Go Back", "Clear Prompt" }));
+        mp.put("File", List.of(new String[]{ "Save", "Save As", "Open" }));
+        mp.put("Tools", List.of(new String[]{ "Package", "Go Back", "Clear Prompt" }));
         menu.setMenus(mp);
 
     }
-
 
     private void onGenerateButtonClick(ActionEvent event) {
         if( isGenerating && confirmCancelGeneration() ) {
@@ -124,7 +121,6 @@ public class TextToImageScreenController {
         }
     }
 
-
      private void onImageGenerationComplete(String generatedImagePath){
          decideVisibleContent(generatedImage.getId());
 
@@ -155,7 +151,6 @@ public class TextToImageScreenController {
         generatedImage.setVisible(id.equals(generatedImage.getId()));
     }
 
-
     private boolean confirmCancelGeneration(){
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirmation");
@@ -172,18 +167,7 @@ public class TextToImageScreenController {
     }
 
     private void saveFile(File file, String fileName) throws IOException {
-        File downloadsAppDir = DOWNLOAD_DIR;
-        if ( !downloadsAppDir.exists() ) downloadsAppDir.mkdirs();
-
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setInitialDirectory(downloadsAppDir);
-        fileChooser.setTitle("Save Image As");
-        fileChooser.setInitialFileName(fileName);
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
-        );
-
-        File destination = fileChooser.showSaveDialog(null);
+        File destination = FileChooserUtil.getSaveFile(fileName);
         if (destination != null) {
             Files.copy(file.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
         }

@@ -2,40 +2,40 @@ package com.saikat.pixelle.controllers;
 
 import com.saikat.pixelle.components.*;
 import com.saikat.pixelle.constants.ActionType;
-import com.saikat.pixelle.editor.Gray;
 import com.saikat.pixelle.editor.PhotoEditor;
 import com.saikat.pixelle.listeners.OnActionButtonClick;
 import com.saikat.pixelle.managers.ScreenManager;
+import com.saikat.pixelle.savable.AppSettings;
+import com.saikat.pixelle.savable.SavableManager;
 import com.saikat.pixelle.utils.AlertUtil;
+import com.saikat.pixelle.utils.FileChooserUtil;
 import com.saikat.pixelle.utils.SingletonFactoryUtil;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
 import javafx.geometry.Side;
 import javafx.scene.Node;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.effect.Effect;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Rectangle;
-import org.kordamp.ikonli.fontawesome5.FontAwesomeSolid;
 import org.kordamp.ikonli.javafx.FontIcon;
-import javafx.stage.Stage;
 
+import javax.imageio.ImageIO;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,40 +50,42 @@ public class EditScreenController {
 
     @FXML public FontIcon   redoIcon;
     @FXML public ScrollPane bottomButtonsScrollPane;
-    @FXML public ScrollPane imageContainer;
+    @FXML public ScrollPane imageContainerScrollPane;
+    @FXML public StackPane  imageContainerStackPane;
     @FXML public HBox       header;
     @FXML public ScrollPane sideBorderpane;
     @FXML public HBox       bodyHBox;
 
     private ScreenManager screenManager;
     private PhotoEditor   photoEditor;
+    private AppSettings   appSettings;
 
     private double currentScale = 1.0;
     private ActionToggleButton lastToggleButton;
 
 
     public void initialize() {
+        SavableManager savableManager = SingletonFactoryUtil.getInstance(SavableManager.class);
+        appSettings = (AppSettings) savableManager.getSavableClass(AppSettings.class);
 
         screenManager = SingletonFactoryUtil.getInstance(ScreenManager.class);
-
-        File file = new File(BASE_DIR, CURRENTLY_EDITING_IMAGE + ".png");
         photoEditor = new PhotoEditor(imageView);
+
+        System.out.println("Inside add image: " + appSettings.getSelectedImagePath());
 
         addButtons();
         updateUndoRedo();
         setupListeners();
+        addImage(appSettings.getSelectedImagePath());
 
-
-        Image img = new Image("file:" + file.getAbsolutePath()); // "file:" + "/home/saikat/Pictures/Screenshots/_.png");
-        imageView.setImage(img);
-
-        imageView.fitWidthProperty().bind(imageContainer.widthProperty().divide(UI_SCALE_FACTOR));
-        imageView.fitHeightProperty().bind(imageContainer.heightProperty().divide(UI_SCALE_FACTOR));
+        imageView.fitWidthProperty().bind(imageContainerScrollPane.widthProperty().divide(UI_SCALE_FACTOR));
+        imageView.fitHeightProperty().bind(imageContainerScrollPane.heightProperty().divide(UI_SCALE_FACTOR));
 
         imageView.boundsInLocalProperty().addListener(new ChangeListener<Bounds>() {
             @Override
             public void changed(ObservableValue<? extends Bounds> observableValue, Bounds bounds, Bounds t1) {
                 // imageView.setClip(clipRect);
+                imageContainerStackPane.setMaxSize(t1.getWidth(), t1.getHeight());
             }
         });
 
@@ -113,7 +115,6 @@ public class EditScreenController {
         System.out.println("Click: " + actionType.toString() + ", Is toggle: " + isToggle );
 
         if ( isToggle ) {
-            // TODO: Manage
             if ( lastToggleButton != null ) lastToggleButton.setSelected(false);
             lastToggleButton = (ActionToggleButton) src;
         }
@@ -122,13 +123,13 @@ public class EditScreenController {
             case ZOOM_IN -> zoomIn();
             case ZOOM_OUT -> zoomOut();
             case FILE -> fileOptions(src);
+            case BORDER -> showSidebar(new BorderSideBar());
             case BLUR -> showSidebar(new BlurPreviewSideBar(imageView));
             case FILTER -> showSidebar(new ColorEffectPreviewSideBar(imageView));
             case ADJUST -> showSidebar(new AdjustmentsSideBar());
+            case TEXT -> showSidebar(new TextSideBar());
             case CANCEL -> confirmAndBackToHome();
         }
-
-        // TODO: border option
     }
 
     private void confirmAndBackToHome() {
@@ -137,9 +138,14 @@ public class EditScreenController {
         };
     }
 
+    private void showSidebar(SideBar sidebar){
+        sideBorderpane.setContent(sidebar);
+    }
 
-    private void showSidebar(Object sidebar){
-        sideBorderpane.setContent((Node) sidebar);
+    private void addImage(String path){
+        Image img = new Image("file:" + path); // "file:" + "/home/saikat/Pictures/Screenshots/_.png");
+        imageView.setImage(img);
+        System.out.println("Image set: " + path);
     }
 
     private void fileOptions(ActionButton btn) {
@@ -150,13 +156,42 @@ public class EditScreenController {
         MenuItem item2 = new MenuItem("Save");
         MenuItem item3 = new MenuItem("Save As");
 
-        item1.setOnAction(e -> System.out.println("Option 1 clicked"));
-        item2.setOnAction(e -> System.out.println("Option 2 clicked"));
+        item1.setOnAction(e -> {
+            File imageFile = FileChooserUtil.selectAnImage();
+            if ( imageFile == null ){
+                System.out.println("Selected image is null.");
+            } else {
+                imageView.setImage(new Image(imageFile.toURI().toString()));
+            }
+        });
+        item2.setOnAction(e -> {
+            System.out.println("Option 2 clicked");
+            saveStackPaneToDevice();
+        });
         item3.setOnAction(e -> System.out.println("Option 3 clicked"));
 
         menu.getItems().addAll(item1, item2, item3);
 
         menu.show(btn, Side.BOTTOM, 0, 0);
+    }
+
+    private void saveStackPaneToDevice(){
+        File dest = FileChooserUtil.getSaveFile("filename.png");
+        if ( dest == null  ) {
+            System.out.println("Destination is null, could not save. | in EditScreen controller saveToDevice method.");
+            return;
+        }
+        WritableImage snapshot = new WritableImage((int) imageContainerStackPane.getWidth(), (int) imageContainerStackPane.getHeight());
+        imageContainerStackPane.snapshot(result -> {
+            try {
+                ImageIO.write(SwingFXUtils.fromFXImage(result.getImage(), null), "png", dest);
+                System.out.println("Saved: " + dest.getAbsolutePath());
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            return null;
+        }, null, snapshot);
+
     }
 
     private List<ActionButton> getListOfButtons() {
@@ -165,9 +200,9 @@ public class EditScreenController {
         buttons.add(new ActionToggleButton("Crop", "fas-crop", ActionType.CROP));
         buttons.add(new ActionToggleButton("Rotate", "fas-sync-alt", ActionType.ROTATE));
         buttons.add(new ActionToggleButton("Resize", "fas-expand-arrows-alt", ActionType.RESIZE));
+        buttons.add(new ActionToggleButton("Border", "fas-expand-arrows-alt", ActionType.BORDER));
         buttons.add(new ActionToggleButton("Adjust", "fas-sliders-h", ActionType.ADJUST));
         buttons.add(new ActionToggleButton("Filters", "fas-magic", ActionType.FILTER));
-        buttons.add(new ActionButton("Redo", "fas-redo", ActionType.REDO));
         buttons.add(new ActionButton("Zoom In", "fas-search-plus", ActionType.ZOOM_IN));
         buttons.add(new ActionButton("Zoom Out", "fas-search-minus", ActionType.ZOOM_OUT));
         buttons.add(new ActionButton("Draw", "fas-pen", ActionType.DRAW));
@@ -190,7 +225,7 @@ public class EditScreenController {
             updateUndoRedo();
         });
 
-        imageContainer.setOnScroll(event -> {
+        imageContainerScrollPane.setOnScroll(event -> {
             if (event.isControlDown()) {
                 handleZoomEvent(event);
             } else {
@@ -198,12 +233,12 @@ public class EditScreenController {
             }
         });
 
-        imageContainer.setOnKeyPressed(this::handleKeyEvent);
-        imageContainer.setOnKeyReleased(this::handleKeyEvent);
-        imageContainer.setFocusTraversable(true);
+        imageContainerScrollPane.setOnKeyPressed(this::handleKeyEvent);
+        imageContainerScrollPane.setOnKeyReleased(this::handleKeyEvent);
+        imageContainerScrollPane.setFocusTraversable(true);
 
         // TODO: Not working...
-        imageContainer.sceneProperty().addListener((obs, oldScene, newScene) -> {
+        imageContainerScrollPane.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null) {
                 // newScene.getFocusOwner().focusedProperty().addListener((obs2, oldVal, newVal) -> {
                 //    if (newVal)  imageContainer.requestFocus();
@@ -248,8 +283,8 @@ public class EditScreenController {
             currentScale = 1.0;
             imageView.setScaleX(currentScale);
             imageView.setScaleY(currentScale);
-            imageContainer.setHvalue(0.5);
-            imageContainer.setVvalue(0.5);
+            imageContainerScrollPane.setHvalue(0.5);
+            imageContainerScrollPane.setVvalue(0.5);
             System.out.println("Current Scale: " + currentScale + " (Reset)");
         }
     }
