@@ -14,111 +14,91 @@
       fx:controller="com.saikat.pixelle.controllers.TextToImageScreenController"
       styleClass="bg-generate">
 
-     <HBox styleClass="tti-header" minHeight="70" spacing="20" alignment="CENTER_LEFT" VBox.vgrow="NEVER">
-         <FontIcon iconLiteral="fas-arrow-left"
-                   fill="ghostwhite"
-                   iconSize="20"
-                   styleClass="icon"
-                   onMouseClicked="#onBackIconClick"/>
-         <Label text="Text to Image Generation"
-                styleClass="text"/>
-     </HBox>
+    <HBox styleClass="tti-header" minHeight="70" spacing="20" alignment="CENTER_LEFT" VBox.vgrow="NEVER">
+        <FontIcon iconLiteral="fas-arrow-left"
+                  fill="ghostwhite"
+                  iconSize="20"
+                  styleClass="icon"
+                  onMouseClicked="#onBackIconClick"/>
+        <Label text="Text to Image Generation"
+               styleClass="text"/>
+    </HBox>
 
     <CustomMenu fx:id="menu" />
 
-    <VBox fx:id="mainGridLayout"
-          spacing="1"
-          VBox.vgrow="ALWAYS">
+    <HBox styleClass="input-grid"
+          prefWidth="200"
+          VBox.vgrow="NEVER">
+
+        <VBox.margin>
+            <Insets top="5" />
+        </VBox.margin>
+
+        <TextField fx:id="imagePrompt"
+                   promptText="Enter what you want to generate"
+                   styleClass="text-field"/>
+        <Button fx:id="generateButton"
+                text="Generate"
+                styleClass="btn"
+                graphicTextGap="10">
+        </Button>
+    </HBox>
+
+    <StackPane
+            fx:id="container"
+            alignment="CENTER"
+            VBox.vgrow="ALWAYS">
         <padding>
             <Insets topRightBottomLeft="10" />
         </padding>
-        <HBox styleClass="input-grid"
-              prefWidth="200"
-              VBox.vgrow="NEVER">
-            <TextField fx:id="imagePrompt"
-                       promptText="Enter what you want to generate"
-                       styleClass="text-field"/>
-            <Button fx:id="generateButton"
-                    text="Generate"
-                    styleClass="btn"
-                    graphicTextGap="10">
-            </Button>
-        </HBox>
-        <BorderPane fx:id="container">
-            <padding>
-                <Insets topRightBottomLeft="10" />
-            </padding>
 
-            <center>
-                <Label fx:id="nothingGeneratedText"
-                   AnchorPane.rightAnchor="0"
-                   AnchorPane.topAnchor="0"
-                   AnchorPane.bottomAnchor="0"
-                   AnchorPane.leftAnchor="0"
-                   VBox.vgrow="ALWAYS"
-                   text="Bring your ideas to images..!"
-                   textFill="ghostwhite"
-                   styleClass="text-lg"
-                   maxWidth="200"
-                   alignment="CENTER"/>
-            </center>
+        <Label fx:id="nothingGeneratedText"
+               VBox.vgrow="ALWAYS"
+               text="Bring your ideas to images..!"
+               textFill="ghostwhite"
+               styleClass="text-lg"
+               maxWidth="200"
+               alignment="CENTER"/>
 
-            <center>
-                <Label fx:id="errorOccurredText"
-                   visible="false"
-                   AnchorPane.rightAnchor="0"
-                   AnchorPane.topAnchor="0"
-                   AnchorPane.bottomAnchor="0"
-                   AnchorPane.leftAnchor="0"
-                   text="An Unknown Error Occurred Generating the Image."
-                   textFill="firebrick"
+        <Label fx:id="errorOccurredText"
+               visible="false"
+               text="An Unknown Error Occurred Generating the Image."
+               textFill="firebrick"
+               styleClass="text-md"
+               maxWidth="250"
+               alignment="CENTER"/>
+
+        <VBox fx:id="generatingImageIndicator"
+              visible="false"
+              VBox.vgrow="NEVER"
+              alignment="CENTER"
+              maxWidth="250"
+              spacing="15">
+            <ProgressBar prefWidth="164"/>
+            <Label text="Generating Image. Please wait.."
                    styleClass="text-md"
-                   maxWidth="250"
-                   alignment="CENTER"/>
-            </center>
+                   textFill="ghostwhite" />
+        </VBox>
 
-            <center>
-                <VBox fx:id="generatingImageIndicator"
-                  visible="false"
-                  AnchorPane.rightAnchor="0"
-                  AnchorPane.topAnchor="0"
-                  AnchorPane.bottomAnchor="0"
-                  AnchorPane.leftAnchor="0"
-                  VBox.vgrow="NEVER"
-                  alignment="CENTER"
-                  maxWidth="250"
-                  spacing="15">
-                <ProgressBar prefWidth="164"/>
-                <Label text="Generating Image. Please wait.."
-                       styleClass="text-md"
-                       textFill="ghostwhite" />
+        <HBox fx:id="generatedImage"
+              visible="false"
+              alignment="CENTER"
+              spacing="15">
+
+            <!--  Image View -->
+            <ImageView
+                    fx:id="imageView"
+                    preserveRatio="true"
+                    pickOnBounds="true"
+                    fitWidth="390"
+                    fitHeight="390"/>
+            <VBox alignment="CENTER" spacing="6">
+                <ActionButton actionType="SAVE" title="Save" onMouseClicked="#saveButtonClicked" iconLiteral="fas-save" spacing="3"/>
+                <ActionButton actionType="DRAW" title="Draw" onMouseClicked="#drawButtonClicked" iconLiteral="fas-pen" spacing="3"/>
+                <ActionButton actionType="EDIT" title="Edit" onMouseClicked="#onEditButtonClick" iconLiteral="fas-camera" spacing="3"/>
+                <ActionButton actionType="NONE" title="Re Gen." iconLiteral="fas-redo" spacing="3"/>
             </VBox>
-            </center>
-
-            <center>
-                <HBox fx:id="generatedImage"
-                  visible="false"
-                  alignment="CENTER"
-                  AnchorPane.rightAnchor="0"
-                  AnchorPane.topAnchor="0"
-                  AnchorPane.bottomAnchor="0"
-                  AnchorPane.leftAnchor="0"
-                  spacing="15">
-                    <!--  Image View -->
-                    <ImageView fx:id="imageView"
-                               preserveRatio="true"
-                               pickOnBounds="true"
-                               fitWidth="390"
-                               fitHeight="390"/>
-                    <VBox alignment="CENTER" spacing="6">
-                        <ActionButton actionType="SAVE" title="Save" onMouseClicked="#saveButtonClicked" iconLiteral="fas-save" spacing="3"/>
-                        <ActionButton actionType="DRAW" title="Draw" onMouseClicked="#drawButtonClicked" iconLiteral="fas-pen" spacing="3"/>
-                        <ActionButton actionType="EDIT" title="Edit" onMouseClicked="#onEditButtonClick" iconLiteral="fas-camera" spacing="3"/>
-                        <ActionButton actionType="NONE" title="Re Gen." iconLiteral="fas-redo" spacing="3"/>
-                    </VBox>
-                </HBox>
-            </center>
-        </BorderPane>
-    </VBox>
+        </HBox>
+    </StackPane>
 
 </VBox>

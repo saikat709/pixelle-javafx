@@ -18,6 +18,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
 import java.io.File;
@@ -42,7 +43,7 @@ public class TextToImageScreenController {
     @FXML public HBox      generatedImage;
     @FXML public ImageView imageView;
     @FXML public CustomMenu menu;
-    @FXML public BorderPane container;
+    @FXML public StackPane container;
 
     private boolean       isGenerating = false;
     private ScreenManager screenManager;
@@ -70,8 +71,10 @@ public class TextToImageScreenController {
         });
 
         imageView.fitWidthProperty().bind(container.widthProperty().divide(UI_SCALE_FACTOR).subtract(50));
-        imageView.fitHeightProperty().bind(container.heightProperty().divide(UI_SCALE_FACTOR));
+        imageView.fitHeightProperty().bind(container.heightProperty().divide(UI_SCALE_FACTOR).subtract(20));
+
         generatedImage.setManaged(false);
+        decideVisibleContent(nothingGeneratedText.getId());
 
         progressIndicator = new ProgressIndicator();
         progressIndicator.setPrefSize(19, 20);
