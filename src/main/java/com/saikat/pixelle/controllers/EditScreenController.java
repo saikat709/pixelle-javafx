@@ -8,8 +8,10 @@ import com.saikat.pixelle.managers.ScreenManager;
 import com.saikat.pixelle.savable.AppSettings;
 import com.saikat.pixelle.savable.SavableManager;
 import com.saikat.pixelle.utils.AlertUtil;
+import com.saikat.pixelle.components.CropOverlay;
 import com.saikat.pixelle.utils.FileChooserUtil;
 import com.saikat.pixelle.utils.SingletonFactoryUtil;
+import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingFXUtils;
@@ -17,7 +19,6 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
 import javafx.geometry.Side;
-import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
@@ -31,6 +32,8 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import javax.imageio.ImageIO;
@@ -47,7 +50,6 @@ public class EditScreenController {
     @FXML public VBox       mainVerticalBox;
     @FXML public HBox       actionsBottomBar;
     @FXML public FontIcon   undoIcon;
-
     @FXML public FontIcon   redoIcon;
     @FXML public ScrollPane bottomButtonsScrollPane;
     @FXML public ScrollPane imageContainerScrollPane;
@@ -63,6 +65,7 @@ public class EditScreenController {
     private double currentScale = 1.0;
     private ActionToggleButton lastToggleButton;
 
+    private CropOverlay cropOverlay;
 
     public void initialize() {
         SavableManager savableManager = SingletonFactoryUtil.getInstance(SavableManager.class);
@@ -70,6 +73,8 @@ public class EditScreenController {
 
         screenManager = SingletonFactoryUtil.getInstance(ScreenManager.class);
         photoEditor = new PhotoEditor(imageView);
+
+        cropOverlay = new CropOverlay();
 
         System.out.println("Inside add image: " + appSettings.getSelectedImagePath());
 
@@ -90,8 +95,12 @@ public class EditScreenController {
         });
 
         // adding sidebar
-        sideBorderpane.setContent(new ColorEffectPreviewSideBar(imageView));
-
+        hideSidebar();
+        try {
+            showRotateOverlay(imageContainerStackPane);
+        } catch (Exception ex){
+            System.out.println(ex.getLocalizedMessage());
+        }
     }
 
     private void addButtons(){
@@ -112,23 +121,56 @@ public class EditScreenController {
 
     private void handleActionButtonClick(ActionType actionType, ActionButton src){
         boolean isToggle = src instanceof ActionToggleButton;
-        System.out.println("Click: " + actionType.toString() + ", Is toggle: " + isToggle );
 
-        if ( isToggle ) {
-            if ( lastToggleButton != null ) lastToggleButton.setSelected(false);
-            lastToggleButton = (ActionToggleButton) src;
-        }
+        if (isToggle) {
+            ActionToggleButton srcToggle = (ActionToggleButton) src;
+            if ( lastToggleButton != null && !lastToggleButton.equals(srcToggle)) {
+                lastToggleButton.setSelected(false);
+                if ( cropOverlay != null ) cropOverlay.removeOverlay(imageContainerStackPane);
+            }
+            lastToggleButton = srcToggle;
+            boolean selected = srcToggle.isSelected();
 
-        switch (actionType){
-            case ZOOM_IN -> zoomIn();
-            case ZOOM_OUT -> zoomOut();
-            case FILE -> fileOptions(src);
-            case BORDER -> showSidebar(new BorderSideBar());
-            case BLUR -> showSidebar(new BlurPreviewSideBar(imageView));
-            case FILTER -> showSidebar(new ColorEffectPreviewSideBar(imageView));
-            case ADJUST -> showSidebar(new AdjustmentsSideBar());
-            case TEXT -> showSidebar(new TextSideBar());
-            case CANCEL -> confirmAndBackToHome();
+            switch (actionType){
+                case CROP -> {
+                    if (selected) showCropOverlay();
+                    else cropOverlay.removeOverlay(imageContainerStackPane);
+                    hideSidebar();
+                }
+                case BORDER -> {
+                    if ( selected ) showSidebar(new BorderSideBar());
+                    else hideSidebar();
+                }
+                case RESIZE ->{
+                    if ( selected ) showSidebar(new ResizeSideBar(200, 200));
+                    else hideSidebar();
+                }
+                case BLUR -> {
+                    if ( selected ) showSidebar(new BlurPreviewSideBar(imageView));
+                    else hideSidebar();
+                }
+                case FILTER -> {
+                    if ( selected ) showSidebar(new ColorEffectPreviewSideBar(imageView));
+                    else hideSidebar();
+                }
+                case ADJUST -> {
+                    if ( selected ) showSidebar(new AdjustmentsSideBar());
+                    else hideSidebar();
+                }
+                case TEXT -> {
+                    if (selected) showSidebar(new TextSideBar());
+                    else hideSidebar();
+                }
+            }
+
+        } else {
+            switch (actionType){
+                case ZOOM_IN -> zoomIn();
+                case ZOOM_OUT -> zoomOut();
+                case FILE -> fileOptions(src);
+                case DRAW -> screenManager.drawScreen();
+                case CANCEL -> confirmAndBackToHome();
+            }
         }
     }
 
@@ -139,6 +181,8 @@ public class EditScreenController {
     }
 
     private void showSidebar(SideBar sidebar){
+        sideBorderpane.setVisible(true);
+        sideBorderpane.setManaged(true);
         sideBorderpane.setContent(sidebar);
     }
 
@@ -146,6 +190,16 @@ public class EditScreenController {
         Image img = new Image("file:" + path); // "file:" + "/home/saikat/Pictures/Screenshots/_.png");
         imageView.setImage(img);
         System.out.println("Image set: " + path);
+    }
+
+    private void hideSidebar(){
+        sideBorderpane.setContent(null);
+        sideBorderpane.setVisible(false);
+        sideBorderpane.setManaged(false);
+    }
+
+    private void showCropOverlay(){
+        cropOverlay.createCropper(imageContainerStackPane);
     }
 
     private void fileOptions(ActionButton btn) {
@@ -200,6 +254,7 @@ public class EditScreenController {
         buttons.add(new ActionToggleButton("Crop", "fas-crop", ActionType.CROP));
         buttons.add(new ActionToggleButton("Rotate", "fas-sync-alt", ActionType.ROTATE));
         buttons.add(new ActionToggleButton("Resize", "fas-expand-arrows-alt", ActionType.RESIZE));
+        buttons.add(new ActionToggleButton("Blur", "fas-expand-arrows-alt", ActionType.BLUR));
         buttons.add(new ActionToggleButton("Border", "fas-expand-arrows-alt", ActionType.BORDER));
         buttons.add(new ActionToggleButton("Adjust", "fas-sliders-h", ActionType.ADJUST));
         buttons.add(new ActionToggleButton("Filters", "fas-magic", ActionType.FILTER));
@@ -314,5 +369,21 @@ public class EditScreenController {
         currentScale = Math.max(Math.min(currentScale / ZOOM_FACTOR, 1.85), 0.35);
         imageView.setScaleX(currentScale);
         imageView.setScaleY(currentScale);
+    }
+
+    public void showRotateOverlay(StackPane imageContainerStackPane) {
+        // Create dotted border rectangle
+        Rectangle border = new Rectangle(0, 0);
+        border.setId("rotateOverlay");
+        border.setFill(null);
+        border.setStroke(Color.GREEN);
+        border.setStrokeWidth(3.0);
+        border.getStrokeDashArray().addAll(5.0, 5.0);
+
+        // border.widthProperty().bind(imageView.fitWidthProperty());
+        // border.heightProperty().bind(imageView.fitHeightProperty());
+
+        // Add border to StackPane
+        imageContainerStackPane.getChildren().add(border);
     }
 }

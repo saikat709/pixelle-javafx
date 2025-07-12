@@ -117,4 +117,15 @@ public class ActionButton extends VBox {
     public void setActionType(ActionType actionType) {
         this.actionType.set(actionType);
     }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        return ( (ActionButton) obj ).getActionType() == this.getActionType();
+    }
+
+    @Override
+    public String toString() {
+        return "ActionButton{actionType=" + this.getActionType() + '}';
+    }
 }

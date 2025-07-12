@@ -1,69 +1,89 @@
-package com.saikat.pixelle.utils;
+package com.saikat.pixelle.components;
 
 import javafx.scene.Cursor;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
-public class CropOverlayUtil {
-    public static Rectangle createCropper(StackPane imageContainer) {
-        Rectangle cropRect = new Rectangle(200, 150);
+public class CropOverlay {
+    private final double RESIZE_MARGIN = 15;
+
+    private Rectangle cropRect;
+
+    public Rectangle createCropper(StackPane imageContainer) {
+        cropRect = new Rectangle(200, 150);
 
         cropRect.setStroke(Color.BLUE);
-        cropRect.setStrokeWidth(2);
-        cropRect.setFill(Color.color(0, 0, 1, 0.2)); // semi-transparent
+        cropRect.setStrokeWidth(3);
+        cropRect.setFill(Color.color(0, 0, 1, 0.2));
         cropRect.setCursor(Cursor.MOVE);
 
-        makeDraggable(cropRect);
-        makeResizable(cropRect);
+        makeDraggableAndResizable(cropRect);
+        System.out.println("Pos: " + cropRect.getX() + ", " + cropRect.getY() + " || Image stack: " + imageContainer.getLayoutX() + ", " + imageContainer.getLayoutY());
+        cropRect.setX(-200); //imageContainer.getLayoutX());
+        System.out.println("Pos: " + cropRect.getX() + ", " + cropRect.getY() + " || Image stack: " + imageContainer.getLayoutX() + ", " + imageContainer.getLayoutY());
+
+        // imageContainer.boundsInLocalProperty().addListener(change);
 
         imageContainer.getChildren().add(cropRect);
         return cropRect;
     }
 
-    private static void makeDraggable(Rectangle node) {
+
+    public void removeOverlay(StackPane imageContainer){
+        imageContainer.getChildren().remove(cropRect);
+    }
+
+    private void makeDraggableAndResizable(Rectangle node) {
         final Delta dragDelta = new Delta();
 
         node.setOnMousePressed(e -> {
-            dragDelta.x = node.getLayoutX() - e.getSceneX();
-            dragDelta.y = node.getLayoutY() - e.getSceneY();
-            node.setCursor(Cursor.MOVE);
+            if (isInResizeZone(node, e.getX(), e.getY(), RESIZE_MARGIN)) {
+                node.setCursor(Cursor.SE_RESIZE);
+                System.out.println("Click: Resize.");
+            } else {
+                node.setCursor(Cursor.DEFAULT);
+                dragDelta.x = node.getLayoutX() - e.getSceneX();
+                dragDelta.y = node.getLayoutY() - e.getSceneY();
+                node.setCursor(Cursor.MOVE);
+                System.out.println("Click:  Move.");
+            }
+            System.out.println("Mouse Click.");
         });
 
         node.setOnMouseDragged(e -> {
-            node.setLayoutX(e.getSceneX() + dragDelta.x);
-            node.setLayoutY(e.getSceneY() + dragDelta.y);
+            System.out.println("Dragged (Drag): " + node.getCursor());
+            if (node.getCursor() == Cursor.SE_RESIZE) {
+                double newWidth = e.getX();
+                double newHeight = e.getY();
+                if (newWidth > 20) node.setWidth(newWidth);
+                if (newHeight > 20) node.setHeight(newHeight);
+                System.out.println("Dragged -> w: " + newWidth + ", h: " + newHeight);
+            } else {
+                node.setLayoutX(e.getSceneX() + dragDelta.x);
+                node.setLayoutY(e.getSceneY() + dragDelta.y);
+                System.out.println("Dragged to: " + dragDelta.toString() );
+            }
         });
 
         node.setOnMouseReleased(e -> node.setCursor(Cursor.DEFAULT));
     }
 
-    private static void makeResizable(Rectangle rect) {
-        final double resizeMargin = 8;
 
-        rect.setOnMouseMoved(e -> {
-            if (isInResizeZone(rect, e.getX(), e.getY(), resizeMargin)) {
-                rect.setCursor(Cursor.SE_RESIZE);
-            } else {
-                rect.setCursor(Cursor.DEFAULT);
-            }
-        });
-
-        rect.setOnMouseDragged(e -> {
-            if (rect.getCursor() == Cursor.SE_RESIZE) {
-                double newWidth = e.getX();
-                double newHeight = e.getY();
-                if (newWidth > 20) rect.setWidth(newWidth);
-                if (newHeight > 20) rect.setHeight(newHeight);
-            }
-        });
-    }
-
-    private static boolean isInResizeZone(Rectangle r, double x, double y, double margin) {
+    private boolean isInResizeZone(Rectangle r, double x, double y, double margin) {
         return (x >= r.getWidth() - margin && y >= r.getHeight() - margin);
     }
 
-    private static class Delta {
+    private class Delta {
         double x, y;
+
+        @Override
+        public String toString() {
+            return "Delta{x=" +x + ", y=" + y + "}";
+        }
+    }
+
+    public Rectangle getcropRectangle(){
+        return cropRect;
     }
 }

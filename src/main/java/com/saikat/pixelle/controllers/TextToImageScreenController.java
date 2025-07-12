@@ -16,6 +16,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -28,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.saikat.pixelle.constants.ConstValues.UI_SCALE_FACTOR;
+
 public class TextToImageScreenController {
 
     @FXML public VBox      mainGridLayout;
@@ -39,6 +42,7 @@ public class TextToImageScreenController {
     @FXML public HBox      generatedImage;
     @FXML public ImageView imageView;
     @FXML public CustomMenu menu;
+    @FXML public BorderPane container;
 
     private boolean       isGenerating = false;
     private ScreenManager screenManager;
@@ -64,6 +68,10 @@ public class TextToImageScreenController {
                 appSettings.setLastImageGenPrompt(imagePrompt.getText() + e.getText());
             }
         });
+
+        imageView.fitWidthProperty().bind(container.widthProperty().divide(UI_SCALE_FACTOR).subtract(50));
+        imageView.fitHeightProperty().bind(container.heightProperty().divide(UI_SCALE_FACTOR));
+        generatedImage.setManaged(false);
 
         progressIndicator = new ProgressIndicator();
         progressIndicator.setPrefSize(19, 20);
@@ -121,34 +129,36 @@ public class TextToImageScreenController {
         }
     }
 
-     private void onImageGenerationComplete(String generatedImagePath){
-         decideVisibleContent(generatedImage.getId());
+    private void onImageGenerationComplete(String generatedImagePath){
+        decideVisibleContent(generatedImage.getId());
 
-         String imagePath = "file:" + generatedImagePath;
-         Image image = new Image(imagePath);
-         imageView.setImage(image);
-         this.generatedImagePath = generatedImagePath;
+        String imagePath = "file:" + generatedImagePath;
+        Image image = new Image(imagePath);
+        imageView.setImage(image);
+        this.generatedImagePath = generatedImagePath;
 
-         generateButton.setText("Generate");
-         imagePrompt.setDisable(false);
-         generateButton.setGraphic(null);
-         isGenerating = false;
-     }
+        generateButton.setText("Generate");
+        imagePrompt.setDisable(false);
+        generateButton.setGraphic(null);
+        isGenerating = false;
+    }
 
-     private void onImageGenerationFailed(String errorMessage) {
-         decideVisibleContent(errorOccurredText.getId());
-         generateButton.setText("Generate");
-         imagePrompt.setDisable(false);
-         generateButton.setGraphic(null);
-         isGenerating = false;
-     }
+    private void onImageGenerationFailed(String errorMessage) {
+        decideVisibleContent(errorOccurredText.getId());
+        generateButton.setText("Generate");
+        imagePrompt.setDisable(false);
+        generateButton.setGraphic(null);
+        isGenerating = false;
+    }
 
 
     private void decideVisibleContent(String id){
         nothingGeneratedText.setVisible(id.equals(nothingGeneratedText.getId()));
         generatingImageIndicator.setVisible(id.equals(generatingImageIndicator.getId()));
         errorOccurredText.setVisible(id.equals(errorOccurredText.getId()));
+
         generatedImage.setVisible(id.equals(generatedImage.getId()));
+        generatedImage.setManaged(id.equals(generatedImage.getId()));
     }
 
     private boolean confirmCancelGeneration(){
@@ -183,5 +193,13 @@ public class TextToImageScreenController {
         } catch (IOException e) {
             System.err.println("Could not save generated image. Maybe show an error alert.");
         }
+    }
+
+    public void onEditButtonClick(MouseEvent mouseEvent) {
+        screenManager.editScreen();
+    }
+
+    public void drawButtonClicked(MouseEvent mouseEvent) {
+        screenManager.drawScreen();
     }
 }

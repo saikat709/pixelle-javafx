@@ -42,7 +42,8 @@ public class EntryScreenController {
 
     @FXML
     public void drawButtonClick(MouseEvent mouseEvent) {
-        showPopup("Draw On Canvas", "This screen has not been implemented");
+        // showPopup("Draw On Canvas", "This screen has not been implemented");
+        screenManager.drawScreen();
     }
 
     @FXML

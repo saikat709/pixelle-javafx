@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:id="mainVerticalBox"
+      fx:controller="com.saikat.pixelle.controllers.DrawScreenController"
+      alignment="CENTER">
+
+    <HBox fx:id="header"
+          styleClass="tti-header"
+          minHeight="80"
+          spacing="20"
+          alignment="CENTER_LEFT"
+          VBox.vgrow="NEVER">
+
+        <FontIcon iconLiteral="fas-arrow-left"
+                  fill="ghostwhite"
+                  iconSize="20"
+                  styleClass="icon"
+                  onMouseClicked="#onBackIconClick"/>
+        <Label text="Edit Image"
+               styleClass="text"/>
+
+        <HBox spacing="25"
+              alignment="CENTER_RIGHT"
+              HBox.hgrow="ALWAYS">
+            <padding>
+                <Insets right="30"/>
+            </padding>
+            <FontIcon
+                    fx:id="undoIcon"
+                    iconLiteral="fas-undo"
+                    styleClass="icon"
+                    iconColor="antiquewhite"
+                    disable="true"
+                    iconSize="19"/>
+            <FontIcon
+                    fx:id="redoIcon"
+                    iconLiteral="fas-redo"
+                    styleClass="icon"
+                    iconColor="antiquewhite"
+                    iconSize="19"/>
+        </HBox>
+    </HBox>
+
+    <HBox alignment="CENTER" VBox.vgrow="ALWAYS">
+        <Label text="Drawing buttons and canvas."></Label>
+    </HBox>
+
+</VBox>

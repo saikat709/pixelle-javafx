@@ -2,11 +2,12 @@ package com.saikat.pixelle.screens;
 
 import com.saikat.pixelle.PhotoEditorApplication;
 import com.saikat.pixelle.constants.Screens;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import java.util.Objects;
 
-public class BaseScreen {
+public abstract class BaseScreen {
     protected String fxmlFile;
     protected String cssFile;
     protected String title;
@@ -95,6 +96,11 @@ public class BaseScreen {
 
     public void setCssFile(String cssFile) {
         this.cssFile = cssFile;
+    }
+
+    @FXML
+    public void drawButtonClick(){
+
     }
 
     @Override

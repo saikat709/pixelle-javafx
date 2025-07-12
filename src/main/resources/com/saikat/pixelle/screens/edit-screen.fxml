@@ -65,10 +65,11 @@
                styleClass="scroll-pane-transparent">
                 <BorderPane VBox.vgrow="ALWAYS">
                     <center>
-                        <StackPane fx:id="imageContainerStackPane" style="-fx-background-color: red;">
+                        <StackPane fx:id="imageContainerStackPane">
                             <ImageView
                                 fx:id="imageView"
-                                preserveRatio="true" pickOnBounds="true"
+                                preserveRatio="true"
+                                pickOnBounds="true"
                             />
                         </StackPane>
                     </center>

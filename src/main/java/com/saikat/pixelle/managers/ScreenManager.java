@@ -3,10 +3,7 @@ package com.saikat.pixelle.managers;
 import com.saikat.pixelle.constants.Screens;
 import com.saikat.pixelle.savable.AppSettings;
 import com.saikat.pixelle.savable.SavableManager;
-import com.saikat.pixelle.screens.BaseScreen;
-import com.saikat.pixelle.screens.EditScreen;
-import com.saikat.pixelle.screens.EntryScreen;
-import com.saikat.pixelle.screens.TextToImageScreen;
+import com.saikat.pixelle.screens.*;
 import com.saikat.pixelle.utils.SingletonFactoryUtil;
 import javafx.stage.Stage;
 
@@ -85,8 +82,13 @@ public class ScreenManager {
                 this.textToImageScreen();
                 break;
             case DRAW:
-                //
+                this.drawScreen();
                 break;
         }
+    }
+
+    public void drawScreen() {
+        DrawScreen drawScreen = new DrawScreen();
+        this.showScreen(drawScreen);
     }
 }

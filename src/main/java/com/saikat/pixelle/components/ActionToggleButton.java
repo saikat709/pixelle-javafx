@@ -7,43 +7,51 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.input.MouseEvent;
 
 public class ActionToggleButton extends ActionButton {
-    private boolean isSelected;
+    private static final String SELECTED_STYLE_CLASS = "selected";
     private OnToggleChangeListener onToggleChangeListener;
-
     private final BooleanProperty selected = new SimpleBooleanProperty(false);
 
-    public ActionToggleButton(String crop, String s, ActionType actionType) {
-        super(crop, s, actionType);
+    public ActionToggleButton(String crop, String text, ActionType actionType) {
+        super(crop, text, actionType);
+
+        selected.addListener((obs, oldValue, newValue) -> updateStyleClass(newValue));
     }
 
     @Override
     public void onMouseClicked(MouseEvent mouseEvent) {
+        // Toggle the state
+        setSelected(!isSelected());
+        // Notify listener
+        if (onToggleChangeListener != null) {
+            onToggleChangeListener.onToggleChange(mouseEvent, isSelected(), getActionType());
+        }
+        // Call superclass method if needed
         super.onMouseClicked(mouseEvent);
-        isSelected = !isSelected;
-
-        if ( isSelected ) this.getStyleClass().add("selected");
-        else this.getStyleClass().remove("selected");
-
-        if ( onToggleChangeListener != null )
-            onToggleChangeListener.onToggleChange(mouseEvent, isSelected, this.getActionType());
-
     }
 
-    public void setOnToggleChangeListener(OnToggleChangeListener onToggleChangeListener) {
-        this.onToggleChangeListener = onToggleChangeListener;
+    public void setOnToggleChangeListener(OnToggleChangeListener listener) {
+        this.onToggleChangeListener = listener;
     }
 
     public boolean isSelected() {
         return selected.get();
     }
 
+    public void setSelected(boolean isSelected) {
+        selected.set(isSelected);
+    }
+
     public BooleanProperty selectedProperty() {
         return selected;
     }
 
-    public void setSelected(boolean selected) {
-        this.selected.set(selected);
-        if ( selected ) this.getStyleClass().add("selected");
-        else this.getStyleClass().remove("selected");
+    private void updateStyleClass(boolean isSelected) {
+        if (isSelected) {
+            if (!getStyleClass().contains(SELECTED_STYLE_CLASS)) {
+                getStyleClass().add(SELECTED_STYLE_CLASS);
+            }
+        } else {
+            getStyleClass().remove(SELECTED_STYLE_CLASS);
+        }
     }
 }
