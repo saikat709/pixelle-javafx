@@ -1,5 +1,6 @@
 package com.saikat.pixelle.components;
 
+import com.saikat.pixelle.listeners.OnEffectSelected;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -15,10 +16,16 @@ import javafx.scene.text.FontWeight;
 
 public class BlurPreviewSideBar extends SideBar {
     private final ImageView originalImage;
+    private OnEffectSelected onEffectSelected;
 
     public BlurPreviewSideBar(ImageView image) {
         this.originalImage = image;
         super();
+    }
+
+    public BlurPreviewSideBar(ImageView imageView, OnEffectSelected<GaussianBlur> onEffectSelected){
+        this.onEffectSelected = onEffectSelected;
+        this(imageView);
     }
 
     @Override
@@ -36,17 +43,23 @@ public class BlurPreviewSideBar extends SideBar {
         grid.setVgap(10);
         grid.setPadding(new Insets(8));
 
-        double[] blurLevels = {2, 5, 7, 10, 12, 16};
+        double[] blurLevels = { 0, 2, 4, 6, 8, 10, 12, 14, 16 };
         int col = 0, row = 0;
 
         for (double blurValue : blurLevels) {
             ImageView preview = new ImageView(originalImage.getImage());
-            preview.setFitWidth(70);
+            preview.setFitWidth(110);
             preview.setPreserveRatio(true);
-            preview.setEffect(new GaussianBlur(blurValue));
+
+            GaussianBlur blur = new GaussianBlur(blurValue);
+            preview.setEffect(blur);
 
             StackPane container = new StackPane(preview);
             container.getStyleClass().add("blur-preview");
+
+            container.setOnMouseClicked(e -> {
+                if ( onEffectSelected != null ) onEffectSelected.onSelect(blur);
+            });
 
             grid.add(container, col, row);
 

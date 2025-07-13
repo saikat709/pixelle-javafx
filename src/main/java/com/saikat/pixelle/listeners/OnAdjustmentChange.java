@@ -1,5 +1,7 @@
 package com.saikat.pixelle.listeners;
 
+import javafx.scene.effect.ColorAdjust;
+
 public interface OnAdjustmentChange {
-    public void onChange(double brightness, double contrast, double saturation);
+    public void onChange(ColorAdjust adjustments);
 }

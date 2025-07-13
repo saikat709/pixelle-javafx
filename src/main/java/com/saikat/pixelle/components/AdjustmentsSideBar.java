@@ -7,6 +7,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -17,6 +18,10 @@ public class AdjustmentsSideBar extends SideBar {
 
     public AdjustmentsSideBar() {
         this.onAdjustmentChange = null;
+    }
+
+    public AdjustmentsSideBar(OnAdjustmentChange onAdjustmentChange){
+        this.onAdjustmentChange = onAdjustmentChange;
     }
 
     @Override
@@ -35,7 +40,7 @@ public class AdjustmentsSideBar extends SideBar {
         contrastSlider.setOnMouseReleased(e -> triggerChange());
 
         Label saturationLabel = new Label("Saturation:");
-        Slider saturationSlider = createSlider(-1, 1, 0);
+        Slider saturationSlider = createSlider(-3, 2, 0);
         saturationSlider.setOnMouseReleased(e -> triggerChange());
 
         // Store reference to sliders if needed later
@@ -62,15 +67,17 @@ public class AdjustmentsSideBar extends SideBar {
 
     private void triggerChange() {
         if (onAdjustmentChange != null) {
+            ColorAdjust colorAdjust = new ColorAdjust();
+
             Slider brightness = (Slider) this.lookup("#brightness");
-            Slider contrast = (Slider) this.lookup("#contrast");
+            Slider contrast   = (Slider) this.lookup("#contrast");
             Slider saturation = (Slider) this.lookup("#saturation");
 
-            onAdjustmentChange.onChange(
-                    brightness.getValue(),
-                    contrast.getValue(),
-                    saturation.getValue()
-            );
+            colorAdjust.setBrightness(brightness.getValue());
+            colorAdjust.setContrast(contrast.getValue());
+            colorAdjust.setSaturation(saturation.getValue());
+
+            onAdjustmentChange.onChange(colorAdjust);
         }
     }
 

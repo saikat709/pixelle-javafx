@@ -10,8 +10,8 @@ public class CropOverlay {
 
     private Rectangle cropRect;
 
-    public Rectangle createCropper(StackPane imageContainer) {
-        cropRect = new Rectangle(200, 150);
+    public Rectangle createCropper(StackPane imageContainer, Rectangle imageRect) {
+        cropRect = imageRect;
 
         cropRect.setStroke(Color.BLUE);
         cropRect.setStrokeWidth(3);
@@ -20,11 +20,9 @@ public class CropOverlay {
 
         makeDraggableAndResizable(cropRect);
         System.out.println("Pos: " + cropRect.getX() + ", " + cropRect.getY() + " || Image stack: " + imageContainer.getLayoutX() + ", " + imageContainer.getLayoutY());
-        cropRect.setX(-200); //imageContainer.getLayoutX());
         System.out.println("Pos: " + cropRect.getX() + ", " + cropRect.getY() + " || Image stack: " + imageContainer.getLayoutX() + ", " + imageContainer.getLayoutY());
 
         // imageContainer.boundsInLocalProperty().addListener(change);
-
         imageContainer.getChildren().add(cropRect);
         return cropRect;
     }

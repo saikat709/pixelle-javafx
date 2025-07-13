@@ -199,10 +199,12 @@ public class TextToImageScreenController {
     }
 
     public void onEditButtonClick(MouseEvent mouseEvent) {
+        appSettings.setSelectedImagePath(generatedImagePath);
         screenManager.editScreen();
     }
 
     public void drawButtonClicked(MouseEvent mouseEvent) {
+        appSettings.setSelectedImagePath(generatedImagePath);
         screenManager.drawScreen();
     }
 }

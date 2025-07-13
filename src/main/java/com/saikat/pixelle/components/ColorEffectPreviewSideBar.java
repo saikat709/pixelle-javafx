@@ -1,5 +1,6 @@
 package com.saikat.pixelle.components;
 
+import com.saikat.pixelle.listeners.OnEffectSelected;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -17,11 +18,17 @@ import javafx.scene.text.FontWeight;
 
 public class ColorEffectPreviewSideBar extends SideBar {
     private final ImageView originalImage;
+    private OnEffectSelected<Effect> onEffectSelected;
 
     public ColorEffectPreviewSideBar(ImageView image) {
         this.originalImage = image;
         super();
         this.setSpacing(8.0);
+    }
+
+    public ColorEffectPreviewSideBar(ImageView imageView, OnEffectSelected<Effect> onEffectSelected) {
+        this.onEffectSelected = onEffectSelected;
+        this(imageView);
     }
 
     @Override
@@ -60,6 +67,10 @@ public class ColorEffectPreviewSideBar extends SideBar {
             StackPane container = new StackPane(preview);
             container.setMinWidth(110);
             container.getStyleClass().add("blur-preview");
+
+            container.setOnMouseClicked( e -> {
+                if ( onEffectSelected != null ) onEffectSelected.onSelect(effectItem.effect);
+            });
 
             grid.add(container, col, row);
 
