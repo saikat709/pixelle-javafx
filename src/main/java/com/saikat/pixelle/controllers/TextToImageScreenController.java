@@ -8,6 +8,7 @@ import com.saikat.pixelle.savable.SavableManager;
 import com.saikat.pixelle.utils.GenAIUtil;
 import com.saikat.pixelle.utils.FileChooserUtil;
 import com.saikat.pixelle.utils.SingletonFactoryUtil;
+
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -16,7 +17,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -147,13 +147,14 @@ public class TextToImageScreenController {
     }
 
     private void onImageGenerationFailed(String errorMessage) {
+        errorOccurredText.setText(errorMessage);
+        errorOccurredText.setWrapText(true);
         decideVisibleContent(errorOccurredText.getId());
         generateButton.setText("Generate");
         imagePrompt.setDisable(false);
         generateButton.setGraphic(null);
         isGenerating = false;
     }
-
 
     private void decideVisibleContent(String id){
         nothingGeneratedText.setVisible(id.equals(nothingGeneratedText.getId()));

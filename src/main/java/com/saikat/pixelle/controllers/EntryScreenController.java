@@ -23,7 +23,6 @@ public class EntryScreenController {
     private ScreenManager  screenManager;
     private AppSettings appSettings;
 
-
     @FXML public VBox buttonsContainer;
     @FXML public Label titleText;
 
@@ -33,11 +32,6 @@ public class EntryScreenController {
         appSettings = (AppSettings) savableManager.getSavableClass(AppSettings.class);
 
         HoverUtil.applyScaleHover(titleText, 1.25);
-    }
-
-    @FXML
-    public void checkButtonClick(Event event){
-        System.out.println("Check button clicked");
     }
 
     @FXML
@@ -84,8 +78,6 @@ public class EntryScreenController {
         OpenUtil open = SingletonFactoryUtil.getInstance(OpenUtil.class);
         open.openBrowser(STARTING_HELP_URL);
     }
-
-
 
     private void showPopup(String title, String message){
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

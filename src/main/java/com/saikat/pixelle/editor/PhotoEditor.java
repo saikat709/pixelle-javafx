@@ -1,83 +1,141 @@
 package com.saikat.pixelle.editor;
 
+import com.saikat.pixelle.utils.EffectUtil;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.control.Label;
 import javafx.scene.effect.Effect;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
+import javafx.scene.layout.StackPane;
+
+import javax.imageio.ImageIO;
+import java.io.File;
+import java.io.IOException;
+import java.util.Stack;
 
 public class PhotoEditor {
-    private ImageView currentImage;
-    private Node tail;
+    private ImageView imageView;
+    private StackPane imageContainer;
+
+    private Stack<Type> undoStack;
+    private Stack<Type> redoStack;
+    private Type current;
+
+    private Chain<Effect> effectChain;
+    private Chain<Label>  labelChain;
     private Effect lastEffect;
 
-    private static class Node {
-        Object edit;
-        Node next, previous;
+    private double imageW, imageH;
 
-        public Node(Object object) {
-            this.edit = object;
-            this.next = null;
-            this.previous = null;
-        }
+    public PhotoEditor (ImageView imageView, StackPane stackPane){
+        this.imageView = imageView;
+        this.imageContainer = stackPane;
+
+        this.undoStack    = new Stack<>();
+        this.redoStack    = new Stack<>();
+        this.effectChain  = new Chain<>();
+        this.labelChain   = new Chain<>();
+
+        this.imageW = 0.0;
+        this.imageH = 0.0;
     }
 
-
-    public PhotoEditor (ImageView imageView){
-        this.tail = null;
-        this.currentImage = imageView;
-        this.lastEffect = null;
+    public void initializeImageSize(Image image){
+        this.imageW = image.getWidth();
+        this.imageH = image.getHeight();
     }
-
 
     public void addEffect(Effect effect){
-        // if ( this.lastEffect !=  null ) effect.setInput();
-    }
-
-
-    public void addEditingCommand(EditorCommand command) {
-        System.out.println("Started adding.");
-
-        if ( currentImage == null ){
-            throw new RuntimeException("Currently editing file is null. Never initialized.");
+        if ( lastEffect != null ){
+            EffectUtil.tryChainEffect(effect, lastEffect);
         }
+        this.effectChain.add(effect);
+        this.lastEffect = effect;
+        this.imageView.setEffect(effect);
+        add(Type.EFFECT);
+    }
 
-        Node node = new Node(command);
-        if( tail == null) {
-            node.previous = null;
-            node.next = null;
-            tail = node;
+    public void addText(Label label){
+        this.labelChain.add(label);
+        this.imageContainer.getChildren().add(label);
+        add(Type.TEXT);
+    }
+
+    private void add(Type action) {
+        System.out.println("Add: " + action.toString() + ", Current: " + current);
+        if (this.current != null) {
+            undoStack.push(current);
+            System.out.println("Added to undo stack.");
         }
-
-        node.previous = tail;
-        tail.next = node;
-        tail = node;
-
-        // command.applyToFile(currentlyEditingImage);
-        System.out.println("Applied command " + command);
+        this.current = action;
+        redoStack.clear();
     }
 
+    public void undo() {
+        if ( !undoStack.isEmpty()) {
+            redoStack.push(current);
+            current = undoStack.pop();
 
-    public void redo(){
-        if ( !hasNext() ){
-            throw new RuntimeException("No next edit command found");
+            if ( current == Type.EFFECT ) {
+                effectChain.undo();
+                imageView.setEffect(effectChain.getCurrent());
+            } else {
+                Label a = labelChain.getCurrent();
+                labelChain.undo();
+                imageContainer.getChildren().remove(a);
+            }
+
         }
-        tail = tail.next;
-        // tail.command.applyToFile(currentlyEditingImage);
-        System.out.println("Redo called.");
     }
 
-    public void undo(){
-        if ( !hasPrevious() ){
-            throw new RuntimeException("No previous step.");
+    public void redo() {
+        if (!redoStack.isEmpty()) {
+            undoStack.push(current);
+            current = redoStack.pop();
         }
-        // tail.command.removeAppliedEdit(currentlyEditingImage);
-        tail = tail.previous;
-        System.out.println("Undo called.");
     }
 
-    public boolean hasNext(){
-        return tail != null && tail.next != null;
+    public Type getCurrent() {
+        return current;
     }
 
-    public boolean hasPrevious(){
-        return tail != null && tail.previous != null;
+    public boolean canRedo(){
+        System.out.println("Redo stack: " + redoStack.stream().count());
+        return !redoStack.isEmpty();
+    }
+
+    public boolean canUndo(){
+        System.out.println("Undo stack: " + redoStack.stream().count());
+        return !undoStack.isEmpty();
+    }
+
+    public void exportToPng(File dest){
+        // WritableImage snapshot = new WritableImage((int) imageContainer.getWidth(), (int) imageContainer.getHeight());//
+
+        WritableImage snapshot = new WritableImage((int) imageW, (int) imageH);
+
+        StackPane newStackPane = new StackPane();
+        ImageView newImageView = new ImageView(new Image(imageView.getImage().getUrl()));
+
+        newImageView.setFitHeight(imageH);
+        newImageView.setFitWidth(imageW);
+        newStackPane.getChildren().add(newImageView);
+
+        newStackPane.snapshot(result -> {
+            try {
+                ImageIO.write(SwingFXUtils.fromFXImage(result.getImage(), null), "png", dest);
+                System.out.println("Saved: " + dest.getAbsolutePath());
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            return null;
+        }, null, snapshot);
+    }
+
+
+    private enum Type {
+        EFFECT,
+        TEXT
     }
 }

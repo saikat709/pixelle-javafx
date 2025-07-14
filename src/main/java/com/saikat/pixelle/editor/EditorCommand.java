@@ -8,6 +8,4 @@ import java.io.File;
 public interface EditorCommand {
     public void applyToFile(ImageView file);
     public void removeAppliedEdit(ImageView file);
-
-
 }

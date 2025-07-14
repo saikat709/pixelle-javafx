@@ -104,7 +104,11 @@ public class GenAIUtil {
         if ( listener == null ) throw new NullPointerException("OnImageGeneratedListener cannot be null");
 
         apiThread = new Thread( () -> {
-            generateImage(description);
+            try {
+                generateImage(description);
+            } catch (Exception ex ){
+                if ( listener != null ) listener.onError("Network Error: " + ex.getMessage() );
+            }
         });
         apiThread.start();
     }

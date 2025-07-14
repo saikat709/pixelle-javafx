@@ -14,5 +14,17 @@ public enum ActionType {
     EXIT,
     NONE,
 
-    OPEN, FILE, TEXT, RESET, CANCEL, ZOOM_OUT, ZOOM_IN, REDO, FILTER, ADJUST, RESIZE, ROTATE, BORDER,
+    OPEN,
+    FILE,
+    TEXT,
+    RESET,
+    CANCEL,
+    ZOOM_OUT,
+    ZOOM_IN,
+    REDO,
+    FILTER,
+    ADJUST,
+    RESIZE,
+    ROTATE,
+    BORDER,
 }

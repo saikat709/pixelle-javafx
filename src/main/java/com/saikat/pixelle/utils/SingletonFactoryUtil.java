@@ -9,7 +9,7 @@ public final class SingletonFactoryUtil {
     private static final ConcurrentMap<Class<?>, Object> instances = new ConcurrentHashMap<>();
     
     private SingletonFactoryUtil() {
-        throw new AssertionError("Not instantiable");
+        throw new AssertionError("Not instantiable. Use getInstance(...) method.");
     }
 
     public static <T> T getInstance(Class<T> clazz, Supplier<T> supplier) {

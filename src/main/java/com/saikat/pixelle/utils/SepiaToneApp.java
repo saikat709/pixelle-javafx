@@ -77,11 +77,6 @@ public class SepiaToneApp extends Application {
                 effect = gaussianBlur;
                 break;
             case "Color Input":
-                // This replaces the image with a solid color within a shape
-                // Less of a "filter" and more of a "fill" effect.
-                // Not typically used directly on an ImageView for a filter.
-                // For demonstration, let's just make it a simple red block.
-                // In a real scenario, it's used as an input for other effects (e.g., Blend)
                 effect = new ColorInput(0, 0, imageView.getFitWidth(), imageView.getFitHeight(), javafx.scene.paint.Color.RED);
                 break;
             case "Drop Shadow":
@@ -106,7 +101,6 @@ public class SepiaToneApp extends Application {
                 effect = innerShadow;
                 break;
             case "Lighting":
-                // Lighting can be complex, often involves a Light source
                 Light.Distant light = new Light.Distant();
                 light.setAzimuth(-135.0);
                 Lighting lighting = new Lighting();
@@ -132,22 +126,11 @@ public class SepiaToneApp extends Application {
                 effect = reflection;
                 break;
             case "Blend":
-                // Blend combines two inputs. Here, we blend the original image with a blur.
-                // For a simpler demo, we'll blend it with a solid color.
-                // In practice, you'd use Blend.Mode and two inputs.
                 Blend blend = new Blend();
                 blend.setMode(BlendMode.MULTIPLY);
-                // A more complex example would set inputs:
-                // blend.setTopInput(new BoxBlur());
-                // blend.setBottomInput(new DropShadow());
                 effect = blend;
                 break;
             case "Displacement Map":
-                // Requires a FloatMap. This is for advanced displacement effects.
-                // Not suitable for a simple quick demo without a custom map.
-                // For example, to create a ripple effect.
-                // Effect effect = new DisplacementMap(floatMap, ...);
-                // We'll skip complex setup here.
                 System.out.println("Displacement Map requires a custom FloatMap setup.");
                 break;
             case "Bloom":

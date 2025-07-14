@@ -57,7 +57,7 @@
                text="Bring your ideas to images..!"
                textFill="ghostwhite"
                styleClass="text-lg"
-               maxWidth="200"
+               maxWidth="250"
                alignment="CENTER"/>
 
         <Label fx:id="errorOccurredText"
@@ -65,7 +65,8 @@
                text="An Unknown Error Occurred Generating the Image."
                textFill="firebrick"
                styleClass="text-md"
-               maxWidth="250"
+               textOverrun="LEADING_ELLIPSIS"
+               maxWidth="500"
                alignment="CENTER"/>
 
         <VBox fx:id="generatingImageIndicator"

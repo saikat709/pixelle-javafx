@@ -38,7 +38,6 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -81,7 +80,8 @@ public class EditScreenController {
         appSettings = (AppSettings) savableManager.getSavableClass(AppSettings.class);
         imageViewBoundingRect = new Rectangle();
         screenManager = SingletonFactoryUtil.getInstance(ScreenManager.class);
-        photoEditor = new PhotoEditor(imageView);
+
+        photoEditor = new PhotoEditor(imageView, imageContainerStackPane);
 
         cropOverlay = new CropOverlay();
 
@@ -151,43 +151,28 @@ public class EditScreenController {
                     else hideSidebar();
                 }
                 case BLUR -> {
-                    if ( selected ) showSidebar(new BlurPreviewSideBar(imageView, new OnEffectSelected<GaussianBlur>() {
-                        @Override
-                        public void onSelect(GaussianBlur effect) {
-                            imageView.setEffect(effect);
+                    if ( selected ) showSidebar(new BlurPreviewSideBar(imageView, effect -> {
+                            photoEditor.addEffect(effect);
                         }
-                    }));
+                    ));
                     else hideSidebar();
                 }
                 case FILTER -> {
-                    if ( selected ) showSidebar(new ColorEffectPreviewSideBar(imageView, new OnEffectSelected<Effect>() {
-                        @Override
-                        public void onSelect(Effect effect) {
-                            imageView.setEffect(effect);
+                    if ( selected ) showSidebar(new ColorEffectPreviewSideBar(imageView, effect -> {
+                            photoEditor.addEffect(effect);
                         }
-                    }));
+                    ));
                     else hideSidebar();
                 }
                 case ADJUST -> {
-                    if ( selected ) showSidebar(new AdjustmentsSideBar(new OnAdjustmentChange() {
-                        @Override
-                        public void onChange(ColorAdjust adjustments) {
-                            imageView.setEffect(adjustments);
+                    if ( selected ) showSidebar(new AdjustmentsSideBar( adjustments -> {
+                            photoEditor.addEffect(adjustments);
                         }
-                    }));
+                    ));
                     else hideSidebar();
                 }
                 case TEXT -> {
-                    if (selected) {
-                        Label label = new Label("ADD TEXT");
-                        showSidebar(new TextSideBar(label, new OnTextEditorEvent() {
-                            @Override
-                            public void onDelete() {
-                                System.out.println("Delete button click.");
-                            }
-                        }));
-                        imageContainerStackPane.getChildren().add(label);
-                    }
+                    if (selected) showTextSideBar();
                     else hideSidebar();
                 }
             }
@@ -202,6 +187,32 @@ public class EditScreenController {
                 case CANCEL -> confirmAndBackToHome();
             }
         }
+
+        updateUndoRedo();
+    }
+
+
+    private void showTextSideBar(){
+        Label label = new Label("EDIT TEXT");
+        showTextSideBar(label);
+    }
+
+    private void showTextSideBar(Label label){
+        showSidebar(new TextSideBar(label, new OnTextEditorEvent() {
+
+            @Override
+            public void onAddAndClose(Label edited) {
+                super.onAddAndClose(edited);
+                photoEditor.addText(edited);
+                hideSidebar();
+            }
+
+            @Override
+            public void onDelete(Label label1) {
+                System.out.println("Delete button click.");
+            }
+        }));
+        imageContainerStackPane.getChildren().add(label);
     }
 
     private void confirmAndBackToHome() {
@@ -219,6 +230,7 @@ public class EditScreenController {
     private void addImage(String path){
         Image img = new Image("file:" + path); // "file:" + "/home/saikat/Pictures/Screenshots/_.png");
         imageView.setImage(img);
+        photoEditor.initializeImageSize(img);
         System.out.println("Image set: " + path);
     }
 
@@ -265,17 +277,7 @@ public class EditScreenController {
             System.out.println("Destination is null, could not save. | in EditScreen controller saveToDevice method.");
             return;
         }
-        WritableImage snapshot = new WritableImage((int) imageContainerStackPane.getWidth(), (int) imageContainerStackPane.getHeight());
-        imageContainerStackPane.snapshot(result -> {
-            try {
-                ImageIO.write(SwingFXUtils.fromFXImage(result.getImage(), null), "png", dest);
-                System.out.println("Saved: " + dest.getAbsolutePath());
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-            return null;
-        }, null, snapshot);
-
+        photoEditor.exportToPng(dest);
     }
 
     private List<ActionButton> getListOfButtons() {
@@ -334,8 +336,8 @@ public class EditScreenController {
 
     private void updateUndoRedo() {
         System.out.println("check: undo: - " + undoIcon.isDisable() + " " + redoIcon.isDisable() );
-        undoIcon.setDisable(!photoEditor.hasPrevious());
-        redoIcon.setDisable(!photoEditor.hasNext());
+        undoIcon.setDisable(!photoEditor.canUndo());
+        redoIcon.setDisable(!photoEditor.canRedo());
     }
 
     @FXML
@@ -404,6 +406,6 @@ public class EditScreenController {
     public void rotateImageTo90Degree() {
         currentRotate += 90;
         currentRotate = currentRotate % 360;
-        imageView.setRotate(currentRotate);
+        imageContainerStackPane.setRotate(currentRotate);
     }
 }
