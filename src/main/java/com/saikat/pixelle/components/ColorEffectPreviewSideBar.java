@@ -45,16 +45,21 @@ public class ColorEffectPreviewSideBar extends SideBar {
 
         // Effects
         EffectItem[] effects = {
-                new EffectItem("Normal", null),
-                new EffectItem("Sepia", new SepiaTone(0.8)),
-                new EffectItem("Vintage", new ColorAdjust(-0.2, -0.3, -0.2, 0.2)),
-                new EffectItem("Warm", new ColorAdjust(0.1, 0.2, 0.1, 0.1)),
-                new EffectItem("Cool", new ColorAdjust(-0.1, -0.2, -0.1, 0)),
-                new EffectItem("Invert", null),
-                new EffectItem("Polaroid", new ColorAdjust(0.2, 0.1, 0.3, -0.2)),
-                new EffectItem("Duotone", null),
-                new EffectItem("Lomo", new ColorAdjust(0.3, 0.5, -0.2, 0.5)),
-                new EffectItem("Kodachrome", new ColorAdjust(0.1, 0.1, 0.2, 0.3)),
+            new EffectItem("Normal",        new ColorAdjust(0.0, 0.0, 0.0, 0.0)),
+            new EffectItem("Sepia",         new SepiaTone(0.8)),
+            new EffectItem("Vintage",       new ColorAdjust(-0.2, -0.3, -0.2, 0.2)),
+            new EffectItem("Warm",          new ColorAdjust(0.1, 0.2, 0.1, 0.1)),
+            new EffectItem("Cool",          new ColorAdjust(-0.1, -0.2, -0.1, 0.0)),
+            new EffectItem("Invert",        new ColorAdjust(0.0, -1.0, 0.0, 0.0)),
+            new EffectItem("Polaroid",      new ColorAdjust(0.2, 0.1, 0.3, -0.2)),
+            new EffectItem("Duotone",       new ColorAdjust(0.0, 0.0, 0.0, -0.8)),
+            new EffectItem("Lomo",          new ColorAdjust(0.3, 0.5, -0.2, 0.5)),
+            new EffectItem("Kodachrome",    new ColorAdjust(0.1, 0.1, 0.2, 0.3)),
+            // new EffectItem("BlackAndWhite", new ColorAdjust(0.0, 0.0, 0.0, -1.0)),
+            new EffectItem("HighContrast",  new ColorAdjust(0.0, 0.5, 0.0, 0.0)),
+            new EffectItem("Faded",         new ColorAdjust(-0.3, -0.4, 0.0, -0.5)),
+            new EffectItem("Vivid",         new ColorAdjust(0.2, 0.3, 0.0, 0.4)),
+            new EffectItem("SoftGlow",      new ColorAdjust(0.1, -0.2, 0.0, 0.0))
         };
 
         int col = 0, row = 0;
@@ -69,7 +74,7 @@ public class ColorEffectPreviewSideBar extends SideBar {
             container.getStyleClass().add("blur-preview");
 
             container.setOnMouseClicked( e -> {
-                if ( onEffectSelected != null ) onEffectSelected.onSelect(effectItem.effect);
+                if ( onEffectSelected != null && effectItem.effect != null ) onEffectSelected.onSelect(effectItem.effect);
             });
 
             grid.add(container, col, row);

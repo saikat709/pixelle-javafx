@@ -14,6 +14,7 @@ module com.saikat.pixelle {
     requires com.google.gson;
     requires org.apache.tika.core;
     requires org.apache.commons.io;
+    requires java.instrument;
 
     opens com.saikat.pixelle to javafx.fxml;
     opens com.saikat.pixelle.screens to javafx.fxml;

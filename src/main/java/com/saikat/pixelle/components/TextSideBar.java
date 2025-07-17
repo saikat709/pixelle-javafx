@@ -27,10 +27,10 @@ public class TextSideBar extends SideBar {
 
     private Label label;
 
-    private boolean isBorderShow = false;
+    private boolean isBorderShow     = false;
     private boolean isBackgroundShow = false;
 
-    private final int INITIAL_FONT_SIZE = 20;
+    private final int INITIAL_FONT_SIZE      = 20;
     private final String INITIAL_FONT_FAMILY = "Arial";
 
     public TextSideBar(Label label) {
@@ -52,8 +52,8 @@ public class TextSideBar extends SideBar {
             label.setCursor(Cursor.MOVE);
             double startX = event.getSceneX();
             double startY = event.getSceneY();
-            double nodeX = label.getTranslateX();
-            double nodeY = label.getTranslateY();
+            double nodeX  = label.getTranslateX();
+            double nodeY  = label.getTranslateY();
             label.setUserData(new double[]{startX, startY, nodeX, nodeY});
         });
 
@@ -104,10 +104,15 @@ public class TextSideBar extends SideBar {
         colorPicker.setMinHeight(30);
         color.getChildren().addAll(colorLabel, region, colorPicker);
 
+        HBox fontFamily = new HBox(10);
+        fontFamily.setAlignment(Pos.CENTER_LEFT);
         Label fontLabel = new Label("Font:");
         fontFamilyBox = new ComboBox<>(FXCollections.observableArrayList(Font.getFamilies()));
         fontFamilyBox.setValue(INITIAL_FONT_FAMILY);
         fontFamilyBox.setPrefWidth(200);
+        Region fontSizeGap =  new Region();
+        HBox.setHgrow(fontSizeGap, Priority.ALWAYS);
+        fontFamily.getChildren().addAll(fontLabel, fontSizeGap, fontFamilyBox);
 
         Label sizeLabel = new Label("Font Size:");
         fontSizeSlider = new Slider(5, 40, INITIAL_FONT_SIZE);
@@ -121,8 +126,10 @@ public class TextSideBar extends SideBar {
         this.getChildren().addAll(
                 title, separator,
                 textLabel, inputField,
-                color, fontLabel, fontFamilyBox,
-                sizeLabel, fontSizeSlider
+                color,
+                fontFamily,
+                sizeLabel,
+                fontSizeSlider
         );
     }
 
@@ -239,10 +246,11 @@ public class TextSideBar extends SideBar {
     }
 
     private void addOrDeleteUI() {
-        HBox buttonBox = new HBox(10);
+        VBox buttonBox = new VBox(10);
         buttonBox.setAlignment(Pos.CENTER_LEFT);
 
         Button addButton = new Button("Add and Close");
+        addButton.getStyleClass().addAll("btn", "btn-primary");
         addButton.setOnAction(event -> {
             if (onTextApplyListener != null) {
                 onTextApplyListener.onAddAndClose(label);
@@ -250,6 +258,7 @@ public class TextSideBar extends SideBar {
         });
 
         Button addAndNext = new Button("Add and Next");
+        addAndNext.getStyleClass().addAll("btn", "btn-secondary");
         addAndNext.setOnAction(event -> {
             if (onTextApplyListener != null) {
                 onTextApplyListener.onAddAndNext(label);
@@ -257,6 +266,7 @@ public class TextSideBar extends SideBar {
         });
 
         Button deleteButton = new Button("Delete");
+        deleteButton.getStyleClass().addAll("btn", "btn-error");
         deleteButton.setOnAction(event -> {
             if (onTextApplyListener != null) {
                 onTextApplyListener.onDelete(label);

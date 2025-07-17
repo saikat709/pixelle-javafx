@@ -23,9 +23,22 @@ public class BorderSideBar extends SideBar {
     private OnSliderChange onSliderChange;
     private OnColorSelect  onColorSelect;
 
+    public BorderSideBar(OnSliderChange onSliderChange, OnColorSelect onColorSelect) {
+        this.onSliderChange = onSliderChange;
+        this.onColorSelect = onColorSelect;
+        super();
+    }
+
+    public BorderSideBar(OnColorSelect onColorSelect) {
+        this(null, onColorSelect);
+    }
+
+    public BorderSideBar(OnSliderChange onSliderChange){
+        this(onSliderChange, null);
+    }
+
     public BorderSideBar(){
-        this.onSliderChange = null;
-        this.onColorSelect = null;
+        this(null, null);
     }
 
     @Override

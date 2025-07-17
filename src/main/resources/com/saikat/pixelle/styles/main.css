@@ -4,21 +4,52 @@
 
 .btn {
     -fx-background-color: rgba(8, 2, 17, 0.94);
-    -fx-padding: 10px;
-    -fx-background-radius: 10px;
-    -fx-smooth: 2;
-    -fx-text-fill: white;
-    -fx-border-radius: 10px;
+    -fx-padding: 10px 16px;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
     -fx-border-color: white;
-    -fx-transition-x: all 1;
+    -fx-border-width: 1px;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 6, 0.2, 0, 2);
+    -fx-transition: all 0.3s ease;
 }
 
 .btn:hover {
-    -fx-background-color: rgba(154, 144, 154, 0.65);
+    -fx-background-color: rgba(154, 144, 154, 0.75);
     -fx-text-fill: white;
-    -fx-scale-x: 1.02;
-    -fx-scale-y: 1.02;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
 }
+
+.btn-primary {
+    -fx-background-color: #3498db;
+    -fx-border-color: #2980b9;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #2980b9;
+}
+
+.btn-secondary {
+    -fx-background-color: #95a5a6;
+    -fx-border-color: #7f8c8d;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #7f8c8d;
+}
+
+.btn-error {
+    -fx-background-color: #e74c3c;
+    -fx-border-color: #c0392b;
+}
+
+.btn-error:hover {
+    -fx-background-color: #c0392b;
+}
+
 
 .link {
     -fx-text-fill: white;

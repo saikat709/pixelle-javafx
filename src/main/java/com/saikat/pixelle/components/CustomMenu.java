@@ -6,6 +6,7 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ public class CustomMenu extends MenuBar {
     private OnMenuItemClickListener onMenuItemClickListener;
 
     public CustomMenu() {
+        /**
         Menu fileMenu = new Menu("File");
         MenuItem newFile = new MenuItem("New");
         MenuItem open = new MenuItem("Open");
@@ -25,6 +27,7 @@ public class CustomMenu extends MenuBar {
         MenuItem about = new MenuItem("About");
         helpMenu.getItems().add(about);
         this.getMenus().addAll(fileMenu, editMenu, helpMenu);
+        */
     }
 
     public CustomMenu(Map<String, List<String>> menus, OnMenuItemClickListener listener ){
@@ -38,6 +41,8 @@ public class CustomMenu extends MenuBar {
 
     public void setMenus(Map<String, List<String>> menus){
         this.getMenus().clear();
+
+        // TODO: fix the map ordering
 
         int menuIndex = 0;
         for(Map.Entry<String, List<String>> entry : menus.entrySet()){
@@ -60,8 +65,8 @@ public class CustomMenu extends MenuBar {
                 itemIndex++;
             }
             this.getMenus().add(menu);
-            // if ( menuIndex < menus.size() -  1 ) menu.getItems().add(new SeparatorMenuItem());
-
+            System.out.println(menu.getText());
+            if ( menuIndex < menus.size() -  1 ) menu.getItems().add(new SeparatorMenuItem());
             menuIndex++;
         }
     }

@@ -25,10 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.saikat.pixelle.constants.ConstValues.UI_SCALE_FACTOR;
 
@@ -88,7 +85,7 @@ public class TextToImageScreenController {
         }
 
         // setting up menus
-        Map<String, List<String>> mp = new HashMap<>();
+        Map<String, List<String>> mp = new LinkedHashMap<>();
         mp.put("File", List.of(new String[]{ "Save", "Save As", "Open" }));
         mp.put("Tools", List.of(new String[]{ "Package", "Go Back", "Clear Prompt" }));
         menu.setMenus(mp);

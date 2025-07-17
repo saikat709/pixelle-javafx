@@ -15,12 +15,13 @@ public class EffectUtil {
         }
     }
 
-    public static void tryChainEffect(Effect target, Effect input) {
+    public static Effect tryChainEffect(Effect target, Effect input) {
         try {
             Method setInput = target.getClass().getMethod("setInput", Effect.class);
             setInput.invoke(target, input);
         } catch (Exception e) {
             System.err.println("Cannot chain " + target.getClass().getSimpleName());
         }
+        return target;
     }
 }

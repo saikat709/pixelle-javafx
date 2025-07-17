@@ -3,7 +3,7 @@ package com.saikat.pixelle.components;
 import com.saikat.pixelle.listeners.OnAdjustmentChange;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
@@ -32,27 +32,36 @@ public class AdjustmentsSideBar extends SideBar {
         VBox.setMargin(separator, new Insets(0, 0, 0, 10));
 
         Label brightnessLabel = new Label("Brightness:");
-        Slider brightnessSlider = createSlider(-1, 1, 0);
+        Slider brightnessSlider = createSlider(-2, 2, 0);
         brightnessSlider.setOnMouseReleased(e -> triggerChange());
 
         Label contrastLabel = new Label("Contrast:");
-        Slider contrastSlider = createSlider(-1, 1, 0);
+        Slider contrastSlider = createSlider(-2, 2, 0);
         contrastSlider.setOnMouseReleased(e -> triggerChange());
 
         Label saturationLabel = new Label("Saturation:");
-        Slider saturationSlider = createSlider(-3, 2, 0);
+        Slider saturationSlider = createSlider(-2, 2, 0);
         saturationSlider.setOnMouseReleased(e -> triggerChange());
 
-        // Store reference to sliders if needed later
         brightnessSlider.setId("brightness");
         contrastSlider.setId("contrast");
         saturationSlider.setId("saturation");
+
+        Button btn = new Button("Reset");
+        btn.getStyleClass().addAll("btn", "error");
+        btn.setOnMouseClicked(e -> {
+            contrastSlider.setValue(0);
+            saturationSlider.setValue(0);
+            brightnessSlider.setValue(0);
+            triggerChange();
+        });
 
         this.getChildren().addAll(
                 title, separator,
                 brightnessLabel, brightnessSlider,
                 contrastLabel, contrastSlider,
-                saturationLabel, saturationSlider
+                saturationLabel, saturationSlider,
+                btn
         );
     }
 

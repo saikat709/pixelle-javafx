@@ -46,6 +46,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static com.saikat.pixelle.constants.ConstValues.*;
 
@@ -54,8 +55,7 @@ public class EditScreenController {
     @FXML public ImageView  imageView;
     @FXML public VBox       mainVerticalBox;
     @FXML public HBox       actionsBottomBar;
-    @FXML public FontIcon   undoIcon;
-    @FXML public FontIcon   redoIcon;
+    @FXML public FontIcon   undoIcon, redoIcon;
     @FXML public ScrollPane bottomButtonsScrollPane;
     @FXML public ScrollPane imageContainerScrollPane;
     @FXML public StackPane  imageContainerStackPane;
@@ -67,44 +67,58 @@ public class EditScreenController {
     private PhotoEditor   photoEditor;
     private AppSettings   appSettings;
 
-    private double currentScale = 1.0;
-    private int    currentRotate = 0;
+    private double  currentScale = 1.0;
+    private int     currentRotate = 0;
+    private boolean isSidebarVisible   = false;
+    private boolean adjustmentsChanges = false;
     private ActionToggleButton lastToggleButton;
 
-    private CropOverlay cropOverlay;
+    private CropOverlay  cropOverlay;
+    private Label        label;
+    private Rectangle    imageViewBoundingRect;
+    private Double       currentBorderWidth;
+    private GaussianBlur gaussianBlur;
+    private Effect       colorEffect;
+    private ColorAdjust  colorAdjust;
 
-    private Rectangle imageViewBoundingRect;
+    private AdjustmentsSideBar adjustmentsSideBar;
+
 
     public void initialize() {
         SavableManager savableManager = SingletonFactoryUtil.getInstance(SavableManager.class);
         appSettings = (AppSettings) savableManager.getSavableClass(AppSettings.class);
-        imageViewBoundingRect = new Rectangle();
-        screenManager = SingletonFactoryUtil.getInstance(ScreenManager.class);
 
-        photoEditor = new PhotoEditor(imageView, imageContainerStackPane);
+        this.imageViewBoundingRect = new Rectangle();
+        this.screenManager         = SingletonFactoryUtil.getInstance(ScreenManager.class);
+        this.photoEditor           = new PhotoEditor(imageView, imageContainerStackPane);
+        this.cropOverlay           = new CropOverlay();
 
-        cropOverlay = new CropOverlay();
+        this.currentBorderWidth = 0.0;
+        this.gaussianBlur       = null;
+        this.colorEffect        = null;
+        this.colorAdjust        = null;
 
         addButtons();
-        updateUndoRedo();
         setupListeners();
         addImage(appSettings.getSelectedImagePath());
 
-        imageView.fitWidthProperty().bind(imageContainerScrollPane.widthProperty().divide(UI_SCALE_FACTOR));
-        imageView.fitHeightProperty().bind(imageContainerScrollPane.heightProperty().divide(UI_SCALE_FACTOR));
+        this.imageView.fitWidthProperty().bind(imageContainerScrollPane.widthProperty().divide(UI_SCALE_FACTOR));
+        this.imageView.fitHeightProperty().bind(imageContainerScrollPane.heightProperty().divide(UI_SCALE_FACTOR));
 
-        imageView.boundsInLocalProperty().addListener(new ChangeListener<Bounds>() {
-            @Override
-            public void changed(ObservableValue<? extends Bounds> observableValue, Bounds bounds, Bounds t1) {
-                // imageView.setClip(clipRect);
-                imageContainerStackPane.setMaxSize(t1.getWidth(), t1.getHeight()); // not necessary though
-                // System.out.println("Img size-> w: " + w + ", h: " + h + " | img view size -> w: " + t1.getWidth() + ", h: " + t1.getHeight());
-                imageViewBoundingRect.setHeight(t1.getHeight() - 6);
-                imageViewBoundingRect.setWidth(t1.getWidth() - 6);
-            }
+        this.imageView.boundsInLocalProperty().addListener( ( observableValue,  bounds,  newBounds) -> {
+            // imageView.setClip(clipRect);
+            imageContainerStackPane.setMaxSize(newBounds.getWidth(), newBounds.getHeight()); // not necessary though
+            // System.out.println("Img size-> w: " + w + ", h: " + h + " | img view size -> w: " + newBounds.getWidth() + ", h: " + newBounds.getHeight());
+            imageViewBoundingRect.setHeight(newBounds.getHeight() - 6);
+            imageViewBoundingRect.setWidth(newBounds.getWidth() - 6);
         });
 
-        // adding sidebar
+        this.adjustmentsSideBar = new AdjustmentsSideBar( adjustments -> {
+            this.colorAdjust = adjustments;
+            imageView.setEffect(photoEditor.getappliedEffect(adjustments));
+            adjustmentsChanges = true;
+        });
+
         hideSidebar();
     }
 
@@ -143,7 +157,10 @@ public class EditScreenController {
                     hideSidebar();
                 }
                 case BORDER -> {
-                    if ( selected ) showSidebar(new BorderSideBar());
+                    if ( selected ) {
+                        showSidebar(new BorderSideBar());
+                        this.imageContainerStackPane.getChildren().add(new BorderRectangle(imageView.getX(),  imageView.getY(), imageViewBoundingRect.getWidth(), 30));
+                    }
                     else hideSidebar();
                 }
                 case RESIZE ->{
@@ -151,25 +168,31 @@ public class EditScreenController {
                     else hideSidebar();
                 }
                 case BLUR -> {
-                    if ( selected ) showSidebar(new BlurPreviewSideBar(imageView, effect -> {
-                            photoEditor.addEffect(effect);
-                        }
-                    ));
-                    else hideSidebar();
+                    if ( selected ) {
+                        showSidebar(new BlurPreviewSideBar(getOriginalImageView(), effect -> {
+                            this.gaussianBlur = effect;
+                            imageView.setEffect(photoEditor.getappliedEffect(effect));
+                        }));
+                    } else {
+                        hideSidebar();
+                    }
                 }
                 case FILTER -> {
-                    if ( selected ) showSidebar(new ColorEffectPreviewSideBar(imageView, effect -> {
-                            photoEditor.addEffect(effect);
-                        }
-                    ));
-                    else hideSidebar();
+                    if ( selected ) {
+                        showSidebar(new ColorEffectPreviewSideBar(getOriginalImageView(), effect -> {
+                            this.colorEffect = effect;
+                            imageView.setEffect(photoEditor.getappliedEffect(effect));
+                        }));
+                    } else {
+                        hideSidebar();
+                    }
                 }
                 case ADJUST -> {
-                    if ( selected ) showSidebar(new AdjustmentsSideBar( adjustments -> {
-                            photoEditor.addEffect(adjustments);
-                        }
-                    ));
-                    else hideSidebar();
+                    if ( selected ){
+                        showSidebar(this.adjustmentsSideBar);
+                    } else {
+                        hideSidebar();
+                    }
                 }
                 case TEXT -> {
                     if (selected) showTextSideBar();
@@ -187,13 +210,15 @@ public class EditScreenController {
                 case CANCEL -> confirmAndBackToHome();
             }
         }
-
-        updateUndoRedo();
     }
 
 
+    private ImageView getOriginalImageView(){
+        return new ImageView(new Image("file:" + appSettings.getSelectedImagePath()));
+    }
+
     private void showTextSideBar(){
-        Label label = new Label("EDIT TEXT");
+        label = new Label("EDIT TEXT");
         showTextSideBar(label);
     }
 
@@ -203,8 +228,14 @@ public class EditScreenController {
             @Override
             public void onAddAndClose(Label edited) {
                 super.onAddAndClose(edited);
-                photoEditor.addText(edited);
                 hideSidebar();
+            }
+
+            @Override
+            public void onAddAndNext(Label edited) {
+                super.onAddAndNext(edited);
+                // photoEditor.addLabel(label);
+                // label = new Label("New Text");
             }
 
             @Override
@@ -215,18 +246,6 @@ public class EditScreenController {
         imageContainerStackPane.getChildren().add(label);
     }
 
-    private void confirmAndBackToHome() {
-        if (AlertUtil.confirm("Sure to cancel and go back?")){
-            screenManager.entryScreen();
-        };
-    }
-
-    private void showSidebar(SideBar sidebar){
-        sideBorderpane.setVisible(true);
-        sideBorderpane.setManaged(true);
-        sideBorderpane.setContent(sidebar);
-    }
-
     private void addImage(String path){
         Image img = new Image("file:" + path); // "file:" + "/home/saikat/Pictures/Screenshots/_.png");
         imageView.setImage(img);
@@ -234,10 +253,56 @@ public class EditScreenController {
         System.out.println("Image set: " + path);
     }
 
+    private void confirmAndBackToHome() {
+        if (AlertUtil.confirm("Sure to cancel and go back?")){
+            screenManager.entryScreen();
+        };
+    }
+
+    private void showSidebar(SideBar sidebar){
+        if ( this.isSidebarVisible ){
+            checkEditToAdd();
+        }
+
+        sideBorderpane.setVisible(true);
+        sideBorderpane.setManaged(true);
+        sideBorderpane.setContent(sidebar);
+
+        this.isSidebarVisible = true;
+    }
+
+    private void checkEditToAdd(){
+        if ( gaussianBlur != null ){
+            photoEditor.addBlurEffect(gaussianBlur);
+            gaussianBlur = null;
+        }
+
+        if ( colorEffect != null ){
+            photoEditor.addColorEffect(colorEffect);
+            colorEffect = null;
+        }
+
+        if ( adjustmentsChanges ){
+            photoEditor.addColorEffect(colorAdjust);
+            colorAdjust = null;
+            adjustmentsChanges = false;
+        }
+
+        this.imageView.setEffect(photoEditor.getLastEffect());
+    }
+
     private void hideSidebar(){
+        checkEditToAdd();
+
         sideBorderpane.setContent(null);
         sideBorderpane.setVisible(false);
         sideBorderpane.setManaged(false);
+
+        if ( label != null ){
+            label = null;
+        }
+
+        this.isSidebarVisible = false;
     }
 
     private void showCropOverlay(){
@@ -301,17 +366,6 @@ public class EditScreenController {
 
     private void setupListeners(){
 
-        // undo redo
-        undoIcon.setOnMouseClicked(event -> {
-            photoEditor.undo();
-            updateUndoRedo();
-        });
-
-        redoIcon.setOnMouseClicked( event -> {
-            photoEditor.redo();
-            updateUndoRedo();
-        });
-
         imageContainerScrollPane.setOnScroll(event -> {
             if (event.isControlDown()) {
                 handleZoomEvent(event);
@@ -334,11 +388,6 @@ public class EditScreenController {
         });
     }
 
-    private void updateUndoRedo() {
-        System.out.println("check: undo: - " + undoIcon.isDisable() + " " + redoIcon.isDisable() );
-        undoIcon.setDisable(!photoEditor.canUndo());
-        redoIcon.setDisable(!photoEditor.canRedo());
-    }
 
     @FXML
     public void onBackIconClick(MouseEvent mouseEvent) {

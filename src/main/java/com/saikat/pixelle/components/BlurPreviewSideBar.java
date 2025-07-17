@@ -46,7 +46,8 @@ public class BlurPreviewSideBar extends SideBar {
         double[] blurLevels = { 0, 2, 4, 6, 8, 10, 12, 14, 16 };
         int col = 0, row = 0;
 
-        for (double blurValue : blurLevels) {
+        for ( double blurValue : blurLevels ) {
+
             ImageView preview = new ImageView(originalImage.getImage());
             preview.setFitWidth(110);
             preview.setPreserveRatio(true);
@@ -62,12 +63,12 @@ public class BlurPreviewSideBar extends SideBar {
             });
 
             grid.add(container, col, row);
-
             col++;
             if (col == 2) {
                 col = 0;
                 row++;
             }
+
         }
         this.getChildren().addAll(title, separator, grid);
     }
