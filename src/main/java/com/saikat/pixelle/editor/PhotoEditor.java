@@ -9,23 +9,21 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
-import java.lang.instrument.Instrumentation;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
+import java.util.EmptyStackException;
 import java.util.Stack;
 
 public class PhotoEditor {
+    private final Integer UNDO = 900;
+    private final Integer REDO = 901;
+
     private ImageView imageView;
     private StackPane imageContainer;
-
-    private Rectangle   borderRect;
-    private Rectangle   cropRect;
 
     private double imageW, imageH;
 
@@ -52,6 +50,7 @@ public class PhotoEditor {
         this.lastAppliedGaussianBlur = null;
         this.lastEffect = null;
         this.lastAppliedColorEffect = null;
+        this.lastborderRectangle = new BorderRectangle();
 
         this.effectChainBuilder = new EffectChainBuilder();
 
@@ -64,26 +63,44 @@ public class PhotoEditor {
         this.imageH = image.getHeight();
     }
 
-    public void addBorderRect(BorderRectangle rect){
+    public void addBorder(BorderRectangle borderRectangle){
+        BorderCommand borderCommand = new BorderCommand(lastborderRectangle, borderRectangle);
 
+        undoStack.push(borderCommand);
+
+        imageContainer.getChildren().remove(lastborderRectangle);
+        imageContainer.getChildren().remove(borderRectangle);
+
+        imageContainer.getChildren().add(borderRectangle);
+        this.lastborderRectangle = borderRectangle;
+
+        if ( !redoStack.isEmpty() ) redoStack.clear();
     }
 
     public void addBlurEffect(GaussianBlur effect){
-        Effect newEff = (GaussianBlur) effectChainBuilder.addEffect(effect);
+        Effect newEff = effectChainBuilder.addEffect(effect);
         Command cmd = new EffectCommand(lastEffect, newEff);
+
         undoStack.push(cmd);
         imageView.setEffect(newEff);
+
         this.lastAppliedGaussianBlur = effect;
         this.lastEffect = newEff;
+
+        if ( !redoStack.isEmpty() ) redoStack.clear();
     }
 
     public void addColorEffect(Effect colorEffect){
         Effect newEff = effectChainBuilder.addEffect(colorEffect);
         Command command = new EffectCommand(lastEffect, newEff);
+
         undoStack.push(command);
         imageView.setEffect(colorEffect);
-        this.lastAppliedColorEffect = newEff;
+
+        this.lastAppliedColorEffect = colorEffect;
         this.lastEffect =  newEff;
+
+        if ( !redoStack.isEmpty() ) redoStack.clear();
     }
 
     public Effect getLastEffect() {
@@ -92,6 +109,46 @@ public class PhotoEditor {
 
     public Effect getappliedEffect(Effect effect){
         return effectChainBuilder.getAppliedEffect(effect);
+    }
+
+    public BorderRectangle getLastborderRectangle() {
+        return lastborderRectangle;
+    }
+
+    public void redo(){
+        if ( redoStack.isEmpty() ) {
+            throw new EmptyStackException();
+        }
+        Command command = redoStack.pop();
+        processCommand(command, REDO);
+        undoStack.push(command);
+    }
+
+    public void undo(){
+        System.out.println("Stack: undo -> " + undoStack.size() + ",  redoStack -> " + redoStack.size() );
+
+        if ( undoStack.isEmpty() ){
+            throw new EmptyStackException();
+        }
+
+        Command command = undoStack.pop();
+        processCommand(command, UNDO);
+        redoStack.push(command);
+
+    }
+
+    private void processCommand(Command command, Integer type){
+        if ( command instanceof EffectCommand ){
+            if ( type == REDO ) {
+                System.out.println("Applying.");
+                imageView.setEffect(((EffectCommand) command).getPreviousEffect());
+            } else {
+                imageView.setEffect(((EffectCommand) command).getCurrentEffect());
+                System.out.println("Removing.");
+            }
+        } else if ( command instanceof BorderCommand ){
+
+        }
     }
 
     public boolean canUndo(){

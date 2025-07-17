@@ -3,10 +3,7 @@ package com.saikat.pixelle.controllers;
 import com.saikat.pixelle.components.*;
 import com.saikat.pixelle.constants.ActionType;
 import com.saikat.pixelle.editor.PhotoEditor;
-import com.saikat.pixelle.listeners.OnActionButtonClick;
-import com.saikat.pixelle.listeners.OnAdjustmentChange;
-import com.saikat.pixelle.listeners.OnEffectSelected;
-import com.saikat.pixelle.listeners.OnTextEditorEvent;
+import com.saikat.pixelle.listeners.*;
 import com.saikat.pixelle.managers.ScreenManager;
 import com.saikat.pixelle.savable.AppSettings;
 import com.saikat.pixelle.savable.SavableManager;
@@ -14,12 +11,8 @@ import com.saikat.pixelle.utils.AlertUtil;
 import com.saikat.pixelle.components.CropOverlay;
 import com.saikat.pixelle.utils.FileChooserUtil;
 import com.saikat.pixelle.utils.SingletonFactoryUtil;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.geometry.Bounds;
 import javafx.geometry.Side;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -38,6 +31,7 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -71,17 +65,19 @@ public class EditScreenController {
     private int     currentRotate = 0;
     private boolean isSidebarVisible   = false;
     private boolean adjustmentsChanges = false;
+    private boolean borderModified     = false;
     private ActionToggleButton lastToggleButton;
 
     private CropOverlay  cropOverlay;
     private Label        label;
     private Rectangle    imageViewBoundingRect;
-    private Double       currentBorderWidth;
+    private BorderRectangle  currentBorderRect;
     private GaussianBlur gaussianBlur;
     private Effect       colorEffect;
     private ColorAdjust  colorAdjust;
 
     private AdjustmentsSideBar adjustmentsSideBar;
+    private BorderSideBar      borderSideBar;
 
 
     public void initialize() {
@@ -93,7 +89,7 @@ public class EditScreenController {
         this.photoEditor           = new PhotoEditor(imageView, imageContainerStackPane);
         this.cropOverlay           = new CropOverlay();
 
-        this.currentBorderWidth = 0.0;
+        this.currentBorderRect  = new BorderRectangle();
         this.gaussianBlur       = null;
         this.colorEffect        = null;
         this.colorAdjust        = null;
@@ -106,11 +102,9 @@ public class EditScreenController {
         this.imageView.fitHeightProperty().bind(imageContainerScrollPane.heightProperty().divide(UI_SCALE_FACTOR));
 
         this.imageView.boundsInLocalProperty().addListener( ( observableValue,  bounds,  newBounds) -> {
-            // imageView.setClip(clipRect);
             imageContainerStackPane.setMaxSize(newBounds.getWidth(), newBounds.getHeight()); // not necessary though
-            // System.out.println("Img size-> w: " + w + ", h: " + h + " | img view size -> w: " + newBounds.getWidth() + ", h: " + newBounds.getHeight());
-            imageViewBoundingRect.setHeight(newBounds.getHeight() - 6);
-            imageViewBoundingRect.setWidth(newBounds.getWidth() - 6);
+            imageViewBoundingRect.setHeight(newBounds.getHeight() - 4);
+            imageViewBoundingRect.setWidth(newBounds.getWidth() - 4);
         });
 
         this.adjustmentsSideBar = new AdjustmentsSideBar( adjustments -> {
@@ -119,7 +113,42 @@ public class EditScreenController {
             adjustmentsChanges = true;
         });
 
+        this.borderSideBar = new BorderSideBar(new OnBorderUpdate() {
+            @Override
+            public void onBorderUpdate(Color border, Double width) {
+                currentBorderRect.setStroke(border);
+                currentBorderRect.setStrokeWidth(width);
+
+                currentBorderRect.setWidth(imageViewBoundingRect.getWidth() - width + 5);
+                currentBorderRect.setHeight(imageViewBoundingRect.getHeight() - width + 5);
+
+                imageContainerStackPane.getChildren().remove(photoEditor.getLastborderRectangle());
+                imageContainerStackPane.getChildren().remove(currentBorderRect);
+                imageContainerStackPane.getChildren().add(currentBorderRect);
+
+                borderModified = true;
+            }
+        });
+
         hideSidebar();
+
+        redoIcon.setOnMouseClicked(event -> {
+            photoEditor.redo();
+            updateRedoUndoState();
+        });
+
+        undoIcon.setOnMouseClicked(event ->  {
+            photoEditor.undo();
+            updateRedoUndoState();
+        });
+
+        updateRedoUndoState();
+    }
+
+
+    private void updateRedoUndoState(){
+        redoIcon.setDisable(!photoEditor.canRedo());
+        undoIcon.setDisable(!photoEditor.canUndo());
     }
 
     private void addButtons(){
@@ -157,10 +186,7 @@ public class EditScreenController {
                     hideSidebar();
                 }
                 case BORDER -> {
-                    if ( selected ) {
-                        showSidebar(new BorderSideBar());
-                        this.imageContainerStackPane.getChildren().add(new BorderRectangle(imageView.getX(),  imageView.getY(), imageViewBoundingRect.getWidth(), 30));
-                    }
+                    if ( selected ) showSidebar(this.borderSideBar);
                     else hideSidebar();
                 }
                 case RESIZE ->{
@@ -210,6 +236,8 @@ public class EditScreenController {
                 case CANCEL -> confirmAndBackToHome();
             }
         }
+
+        updateRedoUndoState();
     }
 
 
@@ -288,10 +316,17 @@ public class EditScreenController {
             adjustmentsChanges = false;
         }
 
+        if ( borderModified ){
+             photoEditor.addBorder(currentBorderRect);
+             borderModified = false;
+        }
+
         this.imageView.setEffect(photoEditor.getLastEffect());
     }
 
     private void hideSidebar(){
+        System.out.println("called.");
+
         checkEditToAdd();
 
         sideBorderpane.setContent(null);

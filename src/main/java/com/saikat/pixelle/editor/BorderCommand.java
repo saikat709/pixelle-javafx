@@ -1,32 +1,21 @@
 package com.saikat.pixelle.editor;
 
-import javafx.scene.paint.Color;
+import com.saikat.pixelle.components.BorderRectangle;
 
 public class BorderCommand extends Command {
-    private Double currentVal;
-    private Color currentColor;
+    private BorderRectangle currentBorder;
+    private BorderRectangle previousBorder;
 
-    private Double previousVal;
-    private Double previousColor;
-
-    public BorderCommand(Double currentVal, Double previousVal) {
-        this.currentVal = currentVal;
-        this.previousVal = previousVal;
+    public BorderCommand(BorderRectangle currentBorder, BorderRectangle previousBorder) {
+        this.currentBorder = currentBorder;
+        this.previousBorder = previousBorder;
     }
 
-    public Double getCurrentVal() {
-        return currentVal;
+    public BorderRectangle getCurrentBorder() {
+        return currentBorder;
     }
 
-    public Double getPreviousVal() {
-        return previousVal;
-    }
-
-    public void setCurrentVal(Double currentVal) {
-        this.currentVal = currentVal;
-    }
-
-    public void setPreviousVal(Double previousVal) {
-        this.previousVal = previousVal;
+    public BorderRectangle getPreviousBorder() {
+        return previousBorder;
     }
 }

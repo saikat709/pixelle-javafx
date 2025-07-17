@@ -39,7 +39,6 @@
                     iconLiteral="fas-undo"
                     styleClass="icon"
                     iconColor="antiquewhite"
-                    disable="true"
                     iconSize="19"/>
             <FontIcon
                     fx:id="redoIcon"

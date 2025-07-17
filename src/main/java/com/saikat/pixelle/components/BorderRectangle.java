@@ -12,6 +12,11 @@ public class BorderRectangle extends Rectangle {
         this(0, 0, 0, 0);
     }
 
+    public BorderRectangle(Color color, Double width) {
+        this(0, 0, 0, width);
+        this.setStroke(color);
+    }
+
     public BorderRectangle(double x, double y, double width, double height) {
         super(x, y, width, height);
         this.setFill(null);

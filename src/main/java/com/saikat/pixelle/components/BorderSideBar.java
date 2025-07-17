@@ -1,5 +1,6 @@
 package com.saikat.pixelle.components;
 
+import com.saikat.pixelle.listeners.OnBorderUpdate;
 import com.saikat.pixelle.listeners.OnColorSelect;
 import com.saikat.pixelle.listeners.OnSliderChange;
 import javafx.event.ActionEvent;
@@ -7,10 +8,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.control.ColorPicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
-import javafx.scene.control.Slider;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -20,29 +18,24 @@ import java.awt.event.MouseEvent;
 
 public class BorderSideBar extends SideBar {
 
-    private OnSliderChange onSliderChange;
-    private OnColorSelect  onColorSelect;
-
-    public BorderSideBar(OnSliderChange onSliderChange, OnColorSelect onColorSelect) {
-        this.onSliderChange = onSliderChange;
-        this.onColorSelect = onColorSelect;
-        super();
-    }
-
-    public BorderSideBar(OnColorSelect onColorSelect) {
-        this(null, onColorSelect);
-    }
-
-    public BorderSideBar(OnSliderChange onSliderChange){
-        this(onSliderChange, null);
-    }
+    private OnBorderUpdate onBorderUpdate;
+    private Color  selectedBorderColor;
+    private Double selectedBorderWidth;
 
     public BorderSideBar(){
-        this(null, null);
+        this(null);
+    }
+
+    public  BorderSideBar(OnBorderUpdate onBorderUpdate){
+        this.onBorderUpdate      = onBorderUpdate;
+        this.selectedBorderColor = Color.WHITE;
+        this.selectedBorderWidth = 5.0;
+        super();
     }
 
     @Override
     protected void addElements(){
+        OnBorderUpdate onBorderUpdate1 = this.onBorderUpdate;
 
         Label title = new Label("Image Border");
         title.setAlignment(Pos.CENTER);
@@ -55,29 +48,44 @@ public class BorderSideBar extends SideBar {
         color.setFont(Font.font("Arial", 16));
 
         ColorPicker colorPicker = getColorPicker();
+        colorPicker.setOnAction(event -> {
+            this.selectedBorderColor = colorPicker.getValue();
+            if ( onBorderUpdate1 != null ) onBorderUpdate1.onBorderUpdate(selectedBorderColor, selectedBorderWidth);
+        });
 
         Label width = new Label("Width: ");
         width.setFont(Font.font("Arial", 16));
         Slider slider = new Slider(0, 20, 5);
+        slider.setShowTickLabels(true);
+        slider.setShowTickMarks(true);
 
-        OnSliderChange sliderChange = onSliderChange;
-        slider.setOnMouseReleased(event -> {
-            System.out.println(slider.getValue());
-            if ( sliderChange != null ) sliderChange.onChange(slider.getValue());
+        Button deleteButton = new Button("DELETE");
+        deleteButton.getStyleClass().addAll("btn", "secondary");
+
+        deleteButton.setOnAction(event -> {
+            this.selectedBorderWidth = 0.0;
+            this.selectedBorderColor = Color.TRANSPARENT;
+            if ( onBorderUpdate1 != null ) onBorderUpdate1.onBorderUpdate(Color.TRANSPARENT, 0.0);
         });
 
-        this.getChildren().addAll(title, separator, color, colorPicker, width, slider);
+        slider.setOnMouseReleased(event -> {
+            this.selectedBorderWidth = slider.getValue();
+            this.selectedBorderColor = colorPicker.getValue();
+            if ( onBorderUpdate1 != null ) onBorderUpdate1.onBorderUpdate(selectedBorderColor, selectedBorderWidth);
+        });
+
+        this.getChildren().addAll(title, separator, color, colorPicker, width, slider, deleteButton);
     }
 
     private ColorPicker getColorPicker() {
         ColorPicker colorPicker = new ColorPicker();
 
-        OnColorSelect listener = onColorSelect;
+        OnBorderUpdate listener = this.onBorderUpdate;
         colorPicker.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
                 Color c = colorPicker.getValue();
                 System.out.println(c.toString());
-                if ( listener != null ) listener.onSelect(c);
+                if ( listener != null ) listener.onBorderUpdate(selectedBorderColor, selectedBorderWidth);
             }
         });
         return colorPicker;
