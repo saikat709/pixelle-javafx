@@ -8,14 +8,18 @@ import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 
 import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.EmptyStackException;
+import java.util.Objects;
 import java.util.Stack;
 
 public class PhotoEditor {
@@ -24,6 +28,7 @@ public class PhotoEditor {
 
     private ImageView imageView;
     private StackPane imageContainer;
+    private Pane      drawAndTextPane;
 
     private double imageW, imageH;
 
@@ -38,10 +43,10 @@ public class PhotoEditor {
     private Stack<Command> undoStack;
     private Stack<Command> redoStack;
 
-
-    public PhotoEditor (ImageView imageView, StackPane stackPane){
+    public PhotoEditor (ImageView imageView, StackPane stackPane, Pane drawAndTextPane){
         this.imageView = imageView;
         this.imageContainer = stackPane;
+        this.drawAndTextPane = drawAndTextPane;
 
         this.imageW = 0.0;
         this.imageH = 0.0;
@@ -64,15 +69,15 @@ public class PhotoEditor {
     }
 
     public void addBorder(BorderRectangle borderRectangle){
-        BorderCommand borderCommand = new BorderCommand(lastborderRectangle, borderRectangle);
+        BorderRectangle currRect = borderRectangle.clone();
 
-        undoStack.push(borderCommand);
+        BorderCommand borderCommand = new BorderCommand(currRect, this.lastborderRectangle);
+        this.undoStack.push(borderCommand);
 
-        imageContainer.getChildren().remove(lastborderRectangle);
-        imageContainer.getChildren().remove(borderRectangle);
+        imageContainer.getChildren().remove(this.lastborderRectangle);
+        imageContainer.getChildren().add(borderCommand.getCurrentBorder());
 
-        imageContainer.getChildren().add(borderRectangle);
-        this.lastborderRectangle = borderRectangle;
+        this.lastborderRectangle = borderCommand.getCurrentBorder();
 
         if ( !redoStack.isEmpty() ) redoStack.clear();
     }
@@ -115,6 +120,13 @@ public class PhotoEditor {
         return lastborderRectangle;
     }
 
+    public void addDrawCommand(Shape shape){
+        drawAndTextPane.getChildren().add(shape);
+        DrawCommand drawCommand = new DrawCommand(shape);
+        undoStack.push(drawCommand);
+        if ( !redoStack.isEmpty() ) redoStack.clear();
+    }
+
     public void redo(){
         if ( redoStack.isEmpty() ) {
             throw new EmptyStackException();
@@ -147,7 +159,20 @@ public class PhotoEditor {
                 System.out.println("Removing.");
             }
         } else if ( command instanceof BorderCommand ){
-
+            System.out.println(this.imageContainer.getChildren().toString());
+            this.imageContainer.getChildren().remove(lastborderRectangle);
+            System.out.println(this.imageContainer.getChildren().toString());
+            if ( type == REDO ) {
+                this.imageContainer.getChildren().add(((BorderCommand) command).getCurrentBorder());
+                this.lastborderRectangle = ((BorderCommand) command).getCurrentBorder();
+            } else {
+                this.imageContainer.getChildren().add(((BorderCommand) command).getPreviousBorder());
+                this.lastborderRectangle = ((BorderCommand) command).getPreviousBorder();
+            }
+            System.out.println(this.imageContainer.getChildren().toString());
+        } else if ( command instanceof DrawCommand ){
+            if ( type == REDO ) drawAndTextPane.getChildren().add(((DrawCommand) command).getShape());
+            else drawAndTextPane.getChildren().remove(((DrawCommand) command).getShape());
         }
     }
 

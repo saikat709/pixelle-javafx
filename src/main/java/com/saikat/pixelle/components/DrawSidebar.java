@@ -13,14 +13,16 @@ import javafx.scene.text.FontWeight;
 
 public class DrawSidebar extends SideBar {
     private OnDrawEvent onDrawListener;
-    private StackPane imageContainerStackpane;
+    private Pane drawAndTextPane;
 
-    private ComboBox<String> shapeSelector;
+    private ComboBox<String> shapes;
     private ColorPicker strokeColorPicker;
     private Slider strokeWidthSlider;
 
     private Shape previewShape;
     private double startX, startY;
+
+    private Path path;
 
     private static final String[] SHAPES = {"Pen", "Line", "Circle", "Rectangle"};
     private static final double INITIAL_STROKE_WIDTH = 2.0;
@@ -30,8 +32,8 @@ public class DrawSidebar extends SideBar {
         this(imageContainerStackpane, null);
     }
 
-    public DrawSidebar(StackPane imageContainerStackpane, OnDrawEvent onDrawListener) {
-        this.imageContainerStackpane = imageContainerStackpane;
+    public DrawSidebar(Pane imageContainerStackpane, OnDrawEvent onDrawListener) {
+        this.drawAndTextPane = imageContainerStackpane;
         this.onDrawListener = onDrawListener;
         setSpacing(10);
         setPadding(new Insets(10));
@@ -48,20 +50,24 @@ public class DrawSidebar extends SideBar {
         Separator separator = new Separator(Orientation.HORIZONTAL);
         VBox.setMargin(separator, new Insets(0, 0, 10, 0));
 
+        HBox shapeSelection = new HBox(10);
         Label shapeLabel = new Label("Shape:");
-        shapeSelector = new ComboBox<>();
-        shapeSelector.getItems().addAll(SHAPES);
-        shapeSelector.setValue(SHAPES[0]);
-        shapeSelector.setPrefWidth(200);
+        shapes = new ComboBox<>();
+        shapes.getItems().addAll(SHAPES);
+        shapes.setValue(SHAPES[0]);
+        shapes.setPrefWidth(200);
+        Region region = new Region();
+        HBox.setHgrow(region, Priority.ALWAYS);
+        shapeSelection.getChildren().addAll(shapeLabel, region, shapes);
 
         HBox strokeColorBox = new HBox(10);
         strokeColorBox.setAlignment(Pos.CENTER_LEFT);
         Label strokeColorLabel = new Label("Stroke Color:");
-        Region region = new Region();
-        HBox.setHgrow(region, Priority.ALWAYS);
+        Region region2 = new Region();
+        HBox.setHgrow(region2, Priority.ALWAYS);
         strokeColorPicker = new ColorPicker(INITIAL_STROKE_COLOR);
         strokeColorPicker.setPrefWidth(100);
-        strokeColorBox.getChildren().addAll(strokeColorLabel, region, strokeColorPicker);
+        strokeColorBox.getChildren().addAll(strokeColorLabel, region2, strokeColorPicker);
 
         Label strokeWidthLabel = new Label("Stroke Width:");
         strokeWidthSlider = new Slider(1, 10, INITIAL_STROKE_WIDTH);
@@ -74,41 +80,47 @@ public class DrawSidebar extends SideBar {
 
         this.getChildren().addAll(
                 title, separator,
-                shapeLabel, shapeSelector,
-                strokeColorBox, strokeWidthLabel, strokeWidthSlider
+                shapeSelection,
+                strokeColorBox,
+                strokeWidthLabel,
+                strokeWidthSlider
         );
     }
 
     private void setupListeners() {
-        imageContainerStackpane.setOnMousePressed(event -> {
+        drawAndTextPane.setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown()) {
                 startX = event.getX();
                 startY = event.getY();
 
-                // Initialize preview shape based on selection
-                String selectedShape = shapeSelector.getValue();
-                previewShape = createShape(selectedShape, startX, startY, startX, startY);
+                this.path = new Path();
+                this.path.getElements().add(new MoveTo(startX, startY));
+                System.out.println("Click point: x = " + startX + ", y = " +  startY);
+
+                String selectedShape = shapes.getValue();
+                this.previewShape = createShape(selectedShape, startX, startY, startX, startY);
                 if (previewShape != null) {
-                    imageContainerStackpane.getChildren().add(previewShape);
+                    drawAndTextPane.getChildren().add(previewShape);
                 }
             }
         });
 
-        imageContainerStackpane.setOnMouseDragged(event -> {
+        drawAndTextPane.setOnMouseDragged(event -> {
             if (event.isPrimaryButtonDown() && previewShape != null) {
+                this.path.getElements().add(new LineTo(event.getX(), event.getY()));
                 updatePreviewShape(event.getX(), event.getY());
             }
         });
 
-        imageContainerStackpane.setOnMouseReleased(event -> {
+        drawAndTextPane.setOnMouseReleased(event -> {
             if (previewShape != null) {
-                // Remove preview shape
-                imageContainerStackpane.getChildren().remove(previewShape);
+                drawAndTextPane.getChildren().remove(previewShape);
 
-                // Create and add final shape
-                Shape finalShape = createShape(shapeSelector.getValue(), startX, startY, event.getX(), event.getY());
+                String shapeType = shapes.getValue();
+                Shape finalShape = createShape(shapeType, startX, startY, event.getX(), event.getY());
+
                 if (finalShape != null) {
-                    imageContainerStackpane.getChildren().add(finalShape);
+                    // this.drawAndTextPane.getChildren().add(finalShape);
                     if (onDrawListener != null) {
                         onDrawListener.onDraw(finalShape);
                     }
@@ -117,7 +129,6 @@ public class DrawSidebar extends SideBar {
             }
         });
 
-        // Update shape properties on change
         strokeColorPicker.setOnAction(event -> updateShapeProperties());
         strokeWidthSlider.valueProperty().addListener((obs, old, newVal) -> updateShapeProperties());
     }
@@ -126,9 +137,8 @@ public class DrawSidebar extends SideBar {
         Shape shape = null;
         switch (shapeType) {
             case "Pen":
-                Path path = new Path();
-                path.getElements().add(new MoveTo(x1, y1));
                 path.getElements().add(new LineTo(x2, y2));
+                // path.getElements().add(new ClosePath());
                 shape = path;
                 break;
             case "Line":
@@ -139,11 +149,11 @@ public class DrawSidebar extends SideBar {
                 shape = new Circle(x1, y1, radius);
                 break;
             case "Rectangle":
-                double width = Math.abs(x2 - x1);
+                double width  = Math.abs(x2 - x1);
                 double height = Math.abs(y2 - y1);
-                double minX = Math.min(x1, x2);
-                double minY = Math.min(y1, y2);
-                shape = new Rectangle(minX, minY, width, height);
+                double minX   = Math.min(x1, x2);
+                double minY   = Math.min(y1, y2);
+                shape         = new Rectangle(minX, minY, width, height);
                 break;
         }
         if (shape != null) {
@@ -157,11 +167,11 @@ public class DrawSidebar extends SideBar {
     private void updatePreviewShape(double x, double y) {
         if (previewShape == null) return;
 
-        String selectedShape = shapeSelector.getValue();
-        imageContainerStackpane.getChildren().remove(previewShape);
+        String selectedShape = shapes.getValue();
+        drawAndTextPane.getChildren().remove(previewShape);
         previewShape = createShape(selectedShape, startX, startY, x, y);
         if (previewShape != null) {
-            imageContainerStackpane.getChildren().add(previewShape);
+            drawAndTextPane.getChildren().add(previewShape);
         }
     }
 

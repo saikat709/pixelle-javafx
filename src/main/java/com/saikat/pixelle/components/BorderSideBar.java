@@ -9,6 +9,9 @@ import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -29,7 +32,7 @@ public class BorderSideBar extends SideBar {
     public  BorderSideBar(OnBorderUpdate onBorderUpdate){
         this.onBorderUpdate      = onBorderUpdate;
         this.selectedBorderColor = Color.WHITE;
-        this.selectedBorderWidth = 5.0;
+        this.selectedBorderWidth = 0.0;
         super();
     }
 
@@ -44,10 +47,14 @@ public class BorderSideBar extends SideBar {
         Separator separator = new Separator(Orientation.HORIZONTAL);
         VBox.setMargin(separator, new Insets(0,0,0,10));
 
-        Label color = new Label("Pick Color: ");
-        color.setFont(Font.font("Arial", 16));
-
+        HBox colorSelection = new HBox(10);
+        Label colorLabel = new Label("Pick Color: ");
+        colorLabel.setFont(Font.font("Arial", 16));
+        Region space = new Region();
+        HBox.setHgrow(space, Priority.ALWAYS);
         ColorPicker colorPicker = getColorPicker();
+        colorSelection.getChildren().addAll(colorLabel, space, colorPicker);
+
         colorPicker.setOnAction(event -> {
             this.selectedBorderColor = colorPicker.getValue();
             if ( onBorderUpdate1 != null ) onBorderUpdate1.onBorderUpdate(selectedBorderColor, selectedBorderWidth);
@@ -55,7 +62,7 @@ public class BorderSideBar extends SideBar {
 
         Label width = new Label("Width: ");
         width.setFont(Font.font("Arial", 16));
-        Slider slider = new Slider(0, 20, 5);
+        Slider slider = new Slider(0, 20, 0);
         slider.setShowTickLabels(true);
         slider.setShowTickMarks(true);
 
@@ -74,7 +81,7 @@ public class BorderSideBar extends SideBar {
             if ( onBorderUpdate1 != null ) onBorderUpdate1.onBorderUpdate(selectedBorderColor, selectedBorderWidth);
         });
 
-        this.getChildren().addAll(title, separator, color, colorPicker, width, slider, deleteButton);
+        this.getChildren().addAll(title, separator, colorSelection, width, slider, deleteButton);
     }
 
     private ColorPicker getColorPicker() {

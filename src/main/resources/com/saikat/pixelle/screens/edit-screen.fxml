@@ -65,11 +65,8 @@
                 <BorderPane VBox.vgrow="ALWAYS">
                     <center>
                         <StackPane fx:id="imageContainerStackPane">
-                            <ImageView
-                                fx:id="imageView"
-                                preserveRatio="true"
-                                pickOnBounds="true"
-                            />
+                            <ImageView fx:id="imageView" preserveRatio="true" pickOnBounds="true" />
+                            <Pane fx:id="drawTextPane" style="-fx-background-color: transparent;" />
                         </StackPane>
                     </center>
                 </BorderPane>
