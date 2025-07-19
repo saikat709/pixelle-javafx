@@ -1,9 +1,6 @@
 package com.saikat.pixelle;
 
-import com.saikat.pixelle.constants.Screens;
 import com.saikat.pixelle.managers.ScreenManager;
-import com.saikat.pixelle.savable.AppSettings;
-import com.saikat.pixelle.savable.SavableManager;
 import com.saikat.pixelle.utils.OpenUtil;
 import com.saikat.pixelle.utils.SingletonFactoryUtil;
 import javafx.application.Application;
@@ -22,7 +19,6 @@ public class PhotoEditorApplication extends Application {
         stage.setTitle("Pixelle");
         stage.setMinWidth(760);
         stage.setMinHeight(520);
-
 
         Effect a = new GaussianBlur();
         tryChainEffect(a, new BoxBlur());

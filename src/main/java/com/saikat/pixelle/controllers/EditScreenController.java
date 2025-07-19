@@ -33,6 +33,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import javax.imageio.ImageIO;
@@ -82,7 +83,7 @@ public class EditScreenController {
 
     public void initialize() {
         SavableManager savableManager = SingletonFactoryUtil.getInstance(SavableManager.class);
-        appSettings = (AppSettings) savableManager.getSavableClass(AppSettings.class);
+        this.appSettings = (AppSettings) savableManager.getSavableClass(AppSettings.class);
 
         this.imageViewBoundingRect = new Rectangle();
         this.screenManager         = SingletonFactoryUtil.getInstance(ScreenManager.class);
@@ -170,6 +171,8 @@ public class EditScreenController {
     private void handleActionButtonClick(ActionType actionType, ActionButton src){
         boolean isToggle = src instanceof ActionToggleButton;
 
+        System.out.println(src.getClass().getName());
+
         if (isToggle) {
             ActionToggleButton srcToggle = (ActionToggleButton) src;
             if ( lastToggleButton != null && !lastToggleButton.equals(srcToggle)) {
@@ -224,6 +227,12 @@ public class EditScreenController {
                     if (selected) showTextSideBar();
                     else hideSidebar();
                 }
+                case DRAW -> {
+                    if (selected) showSidebar(new DrawSidebar(imageContainerStackPane, finalShape -> {
+
+                    }));
+                    else hideSidebar();
+                }
             }
 
         } else {
@@ -232,7 +241,6 @@ public class EditScreenController {
                 case ZOOM_OUT -> zoomOut();
                 case FILE -> fileOptions(src);
                 case ROTATE -> rotateImageTo90Degree();
-                case DRAW -> screenManager.drawScreen();
                 case CANCEL -> confirmAndBackToHome();
             }
         }
@@ -392,7 +400,7 @@ public class EditScreenController {
         buttons.add(new ActionToggleButton("Filters", "fas-magic", ActionType.FILTER));
         buttons.add(new ActionButton("Zoom In", "fas-search-plus", ActionType.ZOOM_IN));
         buttons.add(new ActionButton("Zoom Out", "fas-search-minus", ActionType.ZOOM_OUT));
-        buttons.add(new ActionButton("Draw", "fas-pen", ActionType.DRAW));
+        buttons.add(new ActionToggleButton("Draw", "fas-pen", ActionType.DRAW));
         buttons.add(new ActionToggleButton("Text", "fas-font", ActionType.TEXT));
         buttons.add(new ActionButton("Reset", "fas-undo-alt", ActionType.RESET));
         buttons.add(new ActionButton("Cancel", "fas-times", ActionType.CANCEL));
