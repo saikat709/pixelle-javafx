@@ -43,9 +43,9 @@ public class PhotoEditor {
     private Stack<Command> undoStack;
     private Stack<Command> redoStack;
 
-    public PhotoEditor (ImageView imageView, StackPane stackPane, Pane drawAndTextPane){
-        this.imageView = imageView;
-        this.imageContainer = stackPane;
+    public PhotoEditor(ImageView imageView, StackPane stackPane, Pane drawAndTextPane){
+        this.imageView       = imageView;
+        this.imageContainer  = stackPane;
         this.drawAndTextPane = drawAndTextPane;
 
         this.imageW = 0.0;

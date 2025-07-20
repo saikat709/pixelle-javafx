@@ -23,15 +23,11 @@ import javafx.scene.effect.Effect;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
@@ -70,17 +66,16 @@ public class EditScreenController {
     private boolean adjustmentsChanges = false;
     private ActionToggleButton lastToggleButton;
 
-    private CropOverlay  cropOverlay;
-    private Label        label;
-    private Rectangle    imageViewBoundingRect;
+    private CropOverlay      cropOverlay;
+    private Label            label;
+    private Rectangle        imageViewBoundingRect;
     private BorderRectangle  currentBorderRect;
-    private GaussianBlur gaussianBlur;
-    private Effect       colorEffect;
-    private ColorAdjust  colorAdjust;
+    private GaussianBlur     gaussianBlur;
+    private Effect           colorEffect;
+    private ColorAdjust      colorAdjust;
 
     private AdjustmentsSideBar adjustmentsSideBar;
     private BorderSideBar      borderSideBar;
-
 
     public void initialize() {
         SavableManager savableManager = SingletonFactoryUtil.getInstance(SavableManager.class);
@@ -100,16 +95,25 @@ public class EditScreenController {
         setupListeners();
         addImage(appSettings.getSelectedImagePath());
 
-        this.imageView.fitWidthProperty().bind(imageContainerScrollPane.widthProperty().divide(UI_SCALE_FACTOR));
-        this.imageView.fitHeightProperty().bind(imageContainerScrollPane.heightProperty().divide(UI_SCALE_FACTOR));
+        // Bind StackPane size to ScrollPane viewport size
+        imageContainerStackPane.prefWidthProperty().bind(imageContainerScrollPane.widthProperty());
+        imageContainerStackPane.prefHeightProperty().bind(imageContainerScrollPane.heightProperty());
 
-        this.imageView.boundsInLocalProperty().addListener( ( observableValue,  bounds,  newBounds) -> {
-            imageContainerStackPane.setMaxSize(newBounds.getWidth(), newBounds.getHeight()); // not necessary though
-            imageViewBoundingRect.setHeight(newBounds.getHeight() - 4);
-            imageViewBoundingRect.setWidth(newBounds.getWidth() - 4);
+        // Listener for ScrollPane size changes
+        imageContainerScrollPane.widthProperty().addListener((obs, oldVal, newVal) -> {
+            resizeToFit(imageView, newVal.doubleValue(), imageContainerScrollPane.getHeight());
+        });
+        imageContainerScrollPane.heightProperty().addListener((obs, oldVal, newVal) -> {
+            resizeToFit(imageView, imageContainerScrollPane.getWidth(), newVal.doubleValue());
         });
 
-        this.adjustmentsSideBar = new AdjustmentsSideBar( adjustments -> {
+        // Listener for ImageView bounds changes
+        this.imageView.boundsInLocalProperty().addListener((observableValue, bounds, newBounds) -> {
+            System.out.println("imageview size changed. " + newBounds + ", " + bounds);
+            resizeToFit(imageView, imageContainerStackPane.getWidth(), imageContainerStackPane.getHeight());
+        });
+
+        this.adjustmentsSideBar = new AdjustmentsSideBar(adjustments -> {
             this.colorAdjust = adjustments;
             imageView.setEffect(photoEditor.getappliedEffect(adjustments));
             adjustmentsChanges = true;
@@ -117,18 +121,6 @@ public class EditScreenController {
 
         this.borderSideBar = new BorderSideBar((border, width) -> {
             try {
-                if ( currentBorderRect == null ){
-                    System.out.println("Current border rect is null.");
-                    return;
-                }
-                if ( border == null ){
-                    System.out.println("Curren border is null.");
-                    return;
-                }
-                if ( width == null ){
-                    System.out.println("Current border rect is null.");
-                    return;
-                }
                 currentBorderRect.setStroke(border);
                 currentBorderRect.setStrokeWidth(width);
                 currentBorderRect.setFill(Color.TRANSPARENT);
@@ -141,7 +133,7 @@ public class EditScreenController {
 
                 photoEditor.addBorder(currentBorderRect);
                 updateRedoUndoState();
-            } catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         });
@@ -153,7 +145,7 @@ public class EditScreenController {
             updateRedoUndoState();
         });
 
-        undoIcon.setOnMouseClicked(event ->  {
+        undoIcon.setOnMouseClicked(event -> {
             photoEditor.undo();
             updateRedoUndoState();
         });
@@ -161,55 +153,52 @@ public class EditScreenController {
         updateRedoUndoState();
     }
 
-
-    private void updateRedoUndoState(){
+    private void updateRedoUndoState() {
         redoIcon.setDisable(!photoEditor.canRedo());
         undoIcon.setDisable(!photoEditor.canUndo());
     }
 
-    private void addButtons(){
+    private void addButtons() {
         actionsBottomBar.getChildren().clear();
 
         List<ActionButton> buttons = getListOfButtons();
-        for(ActionButton button : buttons){
+        for (ActionButton button : buttons) {
             button.setOnActionButtonClick((event, actionType) -> {
                 ActionButton src = (ActionButton) event.getSource();
-                handleActionButtonClick(actionType, src );
+                handleActionButtonClick(actionType, src);
             });
             actionsBottomBar.getChildren().add(button);
         }
     }
 
-    private void handleActionButtonClick(ActionType actionType, ActionButton src){
+    private void handleActionButtonClick(ActionType actionType, ActionButton src) {
         boolean isToggle = src instanceof ActionToggleButton;
-
-        System.out.println(src.getClass().getName());
 
         if (isToggle) {
             ActionToggleButton srcToggle = (ActionToggleButton) src;
-            if ( lastToggleButton != null && !lastToggleButton.equals(srcToggle)) {
+            if (lastToggleButton != null && !lastToggleButton.equals(srcToggle)) {
                 lastToggleButton.setSelected(false);
-                if ( cropOverlay != null ) cropOverlay.removeOverlay(imageContainerStackPane);
+                if (cropOverlay != null) cropOverlay.removeOverlay(imageContainerStackPane);
             }
             lastToggleButton = srcToggle;
             boolean selected = srcToggle.isSelected();
 
-            switch (actionType){
+            switch (actionType) {
                 case CROP -> {
                     if (selected) showCropOverlay();
                     else cropOverlay.removeOverlay(imageContainerStackPane);
                     hideSidebar();
                 }
                 case BORDER -> {
-                    if ( selected ) showSidebar(this.borderSideBar);
+                    if (selected) showSidebar(this.borderSideBar);
                     else hideSidebar();
                 }
-                case RESIZE ->{
-                    if ( selected ) showSidebar(new ResizeSideBar(200, 200));
+                case RESIZE -> {
+                    if (selected) showSidebar(new ResizeSideBar(200, 200));
                     else hideSidebar();
                 }
                 case BLUR -> {
-                    if ( selected ) {
+                    if (selected) {
                         showSidebar(new BlurPreviewSideBar(getOriginalImageView(), effect -> {
                             this.gaussianBlur = effect;
                             imageView.setEffect(photoEditor.getappliedEffect(effect));
@@ -219,7 +208,7 @@ public class EditScreenController {
                     }
                 }
                 case FILTER -> {
-                    if ( selected ) {
+                    if (selected) {
                         showSidebar(new ColorEffectPreviewSideBar(getOriginalImageView(), effect -> {
                             this.colorEffect = effect;
                             imageView.setEffect(photoEditor.getappliedEffect(effect));
@@ -229,7 +218,7 @@ public class EditScreenController {
                     }
                 }
                 case ADJUST -> {
-                    if ( selected ){
+                    if (selected) {
                         showSidebar(this.adjustmentsSideBar);
                     } else {
                         hideSidebar();
@@ -247,9 +236,8 @@ public class EditScreenController {
                     else hideSidebar();
                 }
             }
-
         } else {
-            switch (actionType){
+            switch (actionType) {
                 case ZOOM_IN -> zoomIn();
                 case ZOOM_OUT -> zoomOut();
                 case FILE -> fileOptions(src);
@@ -261,19 +249,17 @@ public class EditScreenController {
         updateRedoUndoState();
     }
 
-
-    private ImageView getOriginalImageView(){
+    private ImageView getOriginalImageView() {
         return new ImageView(new Image("file:" + appSettings.getSelectedImagePath()));
     }
 
-    private void showTextSideBar(){
+    private void showTextSideBar() {
         label = new Label("EDIT TEXT");
         showTextSideBar(label);
     }
 
-    private void showTextSideBar(Label label){
+    private void showTextSideBar(Label label) {
         showSidebar(new TextSideBar(label, new OnTextEditorEvent() {
-
             @Override
             public void onAddAndClose(Label edited) {
                 super.onAddAndClose(edited);
@@ -283,8 +269,6 @@ public class EditScreenController {
             @Override
             public void onAddAndNext(Label edited) {
                 super.onAddAndNext(edited);
-                // photoEditor.addLabel(label);
-                // label = new Label("New Text");
             }
 
             @Override
@@ -295,21 +279,22 @@ public class EditScreenController {
         imageContainerStackPane.getChildren().add(label);
     }
 
-    private void addImage(String path){
-        Image img = new Image("file:" + path); // "file:" + "/home/saikat/Pictures/Screenshots/_.png");
+    private void addImage(String path) {
+        Image img = new Image("file:" + path);
         imageView.setImage(img);
         photoEditor.initializeImageSize(img);
         System.out.println("Image set: " + path);
+        resizeToFit(imageView, imageContainerScrollPane.getWidth(), imageContainerScrollPane.getHeight());
     }
 
     private void confirmAndBackToHome() {
-        if (AlertUtil.confirm("Sure to cancel and go back?")){
+        if (AlertUtil.confirm("Sure to cancel and go back?")) {
             screenManager.entryScreen();
-        };
+        }
     }
 
-    private void showSidebar(SideBar sidebar){
-        if ( this.isSidebarVisible ){
+    private void showSidebar(SideBar sidebar) {
+        if (this.isSidebarVisible) {
             checkEditToAdd();
         }
 
@@ -320,18 +305,18 @@ public class EditScreenController {
         this.isSidebarVisible = true;
     }
 
-    private void checkEditToAdd(){
-        if ( gaussianBlur != null ){
+    private void checkEditToAdd() {
+        if (gaussianBlur != null) {
             photoEditor.addBlurEffect(gaussianBlur);
             gaussianBlur = null;
         }
 
-        if ( colorEffect != null ){
+        if (colorEffect != null) {
             photoEditor.addColorEffect(colorEffect);
             colorEffect = null;
         }
 
-        if ( adjustmentsChanges ){
+        if (adjustmentsChanges) {
             photoEditor.addColorEffect(colorAdjust);
             colorAdjust = null;
             adjustmentsChanges = false;
@@ -340,23 +325,21 @@ public class EditScreenController {
         this.imageView.setEffect(photoEditor.getLastEffect());
     }
 
-    private void hideSidebar(){
-        System.out.println("called.");
-
+    private void hideSidebar() {
         checkEditToAdd();
 
         sideBorderpane.setContent(null);
         sideBorderpane.setVisible(false);
         sideBorderpane.setManaged(false);
 
-        if ( label != null ){
+        if (label != null) {
             label = null;
         }
 
         this.isSidebarVisible = false;
     }
 
-    private void showCropOverlay(){
+    private void showCropOverlay() {
         cropOverlay.createCropper(imageContainerStackPane, imageViewBoundingRect);
     }
 
@@ -370,10 +353,11 @@ public class EditScreenController {
 
         item1.setOnAction(e -> {
             File imageFile = FileChooserUtil.selectAnImage();
-            if ( imageFile == null ){
+            if (imageFile == null) {
                 System.out.println("Selected image is null.");
             } else {
                 imageView.setImage(new Image(imageFile.toURI().toString()));
+                resizeToFit(imageView, imageContainerScrollPane.getWidth(), imageContainerScrollPane.getHeight());
             }
         });
         item2.setOnAction(e -> {
@@ -387,9 +371,9 @@ public class EditScreenController {
         menu.show(btn, Side.BOTTOM, 0, 0);
     }
 
-    private void saveStackPaneToDevice(){
+    private void saveStackPaneToDevice() {
         File dest = FileChooserUtil.getSaveFile("filename.png");
-        if ( dest == null  ) {
+        if (dest == null) {
             System.out.println("Destination is null, could not save. | in EditScreen controller saveToDevice method.");
             return;
         }
@@ -415,8 +399,7 @@ public class EditScreenController {
         return buttons;
     }
 
-    private void setupListeners(){
-
+    private void setupListeners() {
         imageContainerScrollPane.setOnScroll(event -> {
             if (event.isControlDown()) {
                 handleZoomEvent(event);
@@ -428,17 +411,7 @@ public class EditScreenController {
         imageContainerScrollPane.setOnKeyPressed(this::handleKeyEvent);
         imageContainerScrollPane.setOnKeyReleased(this::handleKeyEvent);
         imageContainerScrollPane.setFocusTraversable(true);
-
-        // TODO: Not working...
-        imageContainerScrollPane.sceneProperty().addListener((obs, oldScene, newScene) -> {
-            if (newScene != null) {
-                // newScene.getFocusOwner().focusedProperty().addListener((obs2, oldVal, newVal) -> {
-                //    if (newVal)  imageContainer.requestFocus();
-                // });
-            }
-        });
     }
-
 
     @FXML
     public void onBackIconClick(MouseEvent mouseEvent) {
@@ -449,21 +422,11 @@ public class EditScreenController {
         if (event.isControlDown() && event.getCode() == KeyCode.EQUALS && event.getEventType() == KeyEvent.KEY_PRESSED) {
             System.out.println("Ctrl + Plus (KP_ADD) key combination detected for zoom IN.");
             event.consume();
-            currentScale *= ZOOM_FACTOR;
-            imageView.setScaleX(currentScale);
-            imageView.setScaleY(currentScale);
-            System.out.println("Current Scale: " + currentScale);
-
+            zoomIn();
         } else if (event.isControlDown() && event.getCode() == KeyCode.MINUS && event.getEventType() == KeyEvent.KEY_PRESSED) {
             System.out.println("Ctrl + Minus (KP_SUBTRACT) key combination detected for zoom OUT.");
-            event.consume(); // Consume the event if you handle it
-
-            currentScale /= ZOOM_FACTOR;
-            if (currentScale < 0.1) currentScale = 0.1;
-            imageView.setScaleX(currentScale);
-            imageView.setScaleY(currentScale);
-            System.out.println("Current Scale: " + currentScale);
-
+            event.consume();
+            zoomOut();
         } else if (event.isControlDown() && event.getCode() == KeyCode.DIGIT0 && event.getEventType() == KeyEvent.KEY_PRESSED) {
             System.out.println("Ctrl + 0 (DIGIT0) key combination detected for reset zoom.");
             event.consume();
@@ -472,40 +435,67 @@ public class EditScreenController {
             imageView.setScaleY(currentScale);
             imageContainerScrollPane.setHvalue(0.5);
             imageContainerScrollPane.setVvalue(0.5);
-            System.out.println("Current Scale: " + currentScale + " (Reset)");
+            resizeToFit(imageView, imageContainerScrollPane.getWidth(), imageContainerScrollPane.getHeight());
         }
     }
 
     private void handleZoomEvent(ScrollEvent event) {
         event.consume();
-
-        if ( event.getDeltaY() == 0 ) return;
+        if (event.getDeltaY() == 0) return;
 
         double zoomFactor = (event.getDeltaY() > 0) ? ZOOM_FACTOR : 1 / ZOOM_FACTOR;
         String zoomType = event.getEventType() == ScrollEvent.SCROLL ? "Mouse Wheel Zoom" : "Touchpad Zoom";
-
         System.out.println(zoomType + " detected. Zoom Factor: " + zoomFactor);
 
         currentScale = Math.max(Math.min(currentScale * zoomFactor, 1.85), 0.35);
-        imageView.setScaleX(currentScale);
-        imageView.setScaleY(currentScale);
+        resizeToFit(imageView, imageContainerStackPane.getWidth(), imageContainerStackPane.getHeight());
     }
 
-    private void zoomIn(){
+    private void zoomIn() {
         currentScale = Math.max(Math.min(currentScale * ZOOM_FACTOR, 1.85), 0.35);
-        imageView.setScaleX(currentScale);
-        imageView.setScaleY(currentScale);
+        resizeToFit(imageView, imageContainerStackPane.getWidth(), imageContainerStackPane.getHeight());
     }
 
-    private void zoomOut(){
+    private void zoomOut() {
         currentScale = Math.max(Math.min(currentScale / ZOOM_FACTOR, 1.85), 0.35);
-        imageView.setScaleX(currentScale);
-        imageView.setScaleY(currentScale);
+        resizeToFit(imageView, imageContainerStackPane.getWidth(), imageContainerStackPane.getHeight());
     }
 
     public void rotateImageTo90Degree() {
         currentRotate += 90;
         currentRotate = currentRotate % 360;
-        imageContainerStackPane.setRotate(currentRotate);
+        imageView.setRotate(currentRotate);
+        resizeToFit(imageView, imageContainerScrollPane.getWidth(), imageContainerScrollPane.getHeight());
+    }
+
+    private void resizeToFit(ImageView imageView, double paneWidth, double paneHeight) {
+        if (imageView.getImage() == null) return;
+
+        double angle = Math.toRadians(imageView.getRotate());
+        double cos   = Math.abs(Math.cos(angle));
+        double sin   = Math.abs(Math.sin(angle));
+
+        double imageWidth  = imageView.getImage().getWidth();
+        double imageHeight = imageView.getImage().getHeight();
+
+        // Calculate rotated bounding box dimensions
+        double rotatedWidth  = imageWidth * cos + imageHeight * sin;
+        double rotatedHeight = imageWidth * sin + imageHeight * cos;
+
+        // Calculate scale to fit within the parent StackPane
+        double scale = Math.min(paneWidth / rotatedWidth, paneHeight / rotatedHeight);
+        scale *= currentScale; // Incorporate zoom factor
+
+        // Apply scaling
+        imageView.setScaleX(scale);
+        imageView.setScaleY(scale);
+
+        // Ensure the image is centered
+         imageView.setTranslateX( - rotatedWidth * scale / 4 );
+         imageView.setTranslateY( - rotatedHeight * scale / 2 );
+
+        // Update the bounding rectangle for other components (e.g., crop overlay, border)
+        imageViewBoundingRect.setWidth(rotatedWidth * scale);
+        imageViewBoundingRect.setHeight(rotatedHeight * scale);
     }
 }

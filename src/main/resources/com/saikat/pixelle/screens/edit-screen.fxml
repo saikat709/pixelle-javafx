@@ -54,22 +54,22 @@
           fx:id="bodyHBox"
           style="-fx-background-color: #813581">
         <ScrollPane
-               fx:id="imageContainerScrollPane"
-               VBox.vgrow="ALWAYS"
-               vbarPolicy="NEVER"
-               hbarPolicy="NEVER"
-               fitToWidth="true"
-               fitToHeight="true"
-               HBox.hgrow="ALWAYS"
-               styleClass="scroll-pane-transparent">
-                <BorderPane VBox.vgrow="ALWAYS">
-                    <center>
-                        <StackPane fx:id="imageContainerStackPane">
-                            <ImageView fx:id="imageView" preserveRatio="true" pickOnBounds="true" />
-                            <Pane fx:id="drawTextPane" style="-fx-background-color: transparent;" />
-                        </StackPane>
-                    </center>
-                </BorderPane>
+                fx:id="imageContainerScrollPane"
+                VBox.vgrow="ALWAYS"
+                vbarPolicy="NEVER"
+                hbarPolicy="NEVER"
+                fitToWidth="true"
+                fitToHeight="true"
+                HBox.hgrow="ALWAYS"
+                styleClass="scroll-pane-transparent">
+            <BorderPane VBox.vgrow="ALWAYS" >
+                <center>
+                    <StackPane fx:id="imageContainerStackPane">
+                        <ImageView fx:id="imageView" preserveRatio="true" pickOnBounds="true" />
+                        <Pane fx:id="drawTextPane" style="-fx-background-color: transparent;" />
+                    </StackPane>
+                </center>
+            </BorderPane>
         </ScrollPane>
         <ScrollPane
                 fx:id="sideBorderpane"
