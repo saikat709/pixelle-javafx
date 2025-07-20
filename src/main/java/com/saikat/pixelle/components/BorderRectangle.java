@@ -3,7 +3,7 @@ package com.saikat.pixelle.components;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
-public class BorderRectangle extends Rectangle implements Cloneable {
+public class BorderRectangle extends Rectangle {
 
     private Double borderWidth;
     private Color  borderColor;
@@ -41,12 +41,19 @@ public class BorderRectangle extends Rectangle implements Cloneable {
         return borderColor;
     }
 
-    @Override
+
     public BorderRectangle clone(){
-        try {
-            return (BorderRectangle) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
-        }
+
+        BorderRectangle newRect = new BorderRectangle();
+
+        newRect.setWidth(this.getWidth());
+        newRect.setHeight(this.getHeight());
+        newRect.setX(this.getX());
+        newRect.setY(this.getY());
+        newRect.setFill(this.getFill());
+        newRect.setStrokeWidth(this.getStrokeWidth());
+        newRect.setStroke(this.getStroke());
+
+        return newRect;
     }
 }

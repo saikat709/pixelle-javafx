@@ -116,17 +116,34 @@ public class EditScreenController {
         });
 
         this.borderSideBar = new BorderSideBar((border, width) -> {
-            currentBorderRect.setStroke(border);
-            currentBorderRect.setStrokeWidth(width);
+            try {
+                if ( currentBorderRect == null ){
+                    System.out.println("Current border rect is null.");
+                    return;
+                }
+                if ( border == null ){
+                    System.out.println("Curren border is null.");
+                    return;
+                }
+                if ( width == null ){
+                    System.out.println("Current border rect is null.");
+                    return;
+                }
+                currentBorderRect.setStroke(border);
+                currentBorderRect.setStrokeWidth(width);
+                currentBorderRect.setFill(Color.TRANSPARENT);
 
-            currentBorderRect.setWidth(imageViewBoundingRect.getWidth() - width + 5);
-            currentBorderRect.setHeight(imageViewBoundingRect.getHeight() - width + 5);
+                currentBorderRect.setWidth(imageViewBoundingRect.getWidth() - width + 5);
+                currentBorderRect.setHeight(imageViewBoundingRect.getHeight() - width + 5);
 
-            imageContainerStackPane.getChildren().remove(photoEditor.getLastborderRectangle());
-            imageContainerStackPane.getChildren().remove(currentBorderRect);
+                if (imageContainerStackPane.getChildren().contains(photoEditor.getLastborderRectangle()))
+                    imageContainerStackPane.getChildren().remove(photoEditor.getLastborderRectangle());
 
-            photoEditor.addBorder(currentBorderRect);
-            updateRedoUndoState();
+                photoEditor.addBorder(currentBorderRect);
+                updateRedoUndoState();
+            } catch (Exception e){
+                e.printStackTrace();
+            }
         });
 
         hideSidebar();

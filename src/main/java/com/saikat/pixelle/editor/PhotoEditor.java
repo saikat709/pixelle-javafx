@@ -151,17 +151,10 @@ public class PhotoEditor {
 
     private void processCommand(Command command, Integer type){
         if ( command instanceof EffectCommand ){
-            if ( type == REDO ) {
-                System.out.println("Applying.");
-                imageView.setEffect(((EffectCommand) command).getPreviousEffect());
-            } else {
-                imageView.setEffect(((EffectCommand) command).getCurrentEffect());
-                System.out.println("Removing.");
-            }
+            if ( type == REDO ) imageView.setEffect(((EffectCommand) command).getPreviousEffect());
+            else  imageView.setEffect(((EffectCommand) command).getCurrentEffect());
         } else if ( command instanceof BorderCommand ){
-            System.out.println(this.imageContainer.getChildren().toString());
             this.imageContainer.getChildren().remove(lastborderRectangle);
-            System.out.println(this.imageContainer.getChildren().toString());
             if ( type == REDO ) {
                 this.imageContainer.getChildren().add(((BorderCommand) command).getCurrentBorder());
                 this.lastborderRectangle = ((BorderCommand) command).getCurrentBorder();
@@ -169,7 +162,6 @@ public class PhotoEditor {
                 this.imageContainer.getChildren().add(((BorderCommand) command).getPreviousBorder());
                 this.lastborderRectangle = ((BorderCommand) command).getPreviousBorder();
             }
-            System.out.println(this.imageContainer.getChildren().toString());
         } else if ( command instanceof DrawCommand ){
             if ( type == REDO ) drawAndTextPane.getChildren().add(((DrawCommand) command).getShape());
             else drawAndTextPane.getChildren().remove(((DrawCommand) command).getShape());
@@ -203,10 +195,5 @@ public class PhotoEditor {
             }
             return null;
         }, null, snapshot);
-    }
-
-    private enum Type {
-        EFFECT,
-        TEXT
     }
 }
